@@ -3,6 +3,9 @@
 Split or join list-like syntax constructs. like `g,` and `gj` from the venerable 
 old [vim-mode-plus][vmp].
 
+> looking for something more mature? [treesj][treesj]  
+> looking for something more bramvim? [splitjoin.vim][sjv] 
+
 ## 🚚 Installation
 
 ```lua
@@ -65,7 +68,9 @@ After:
 
 ## Prior Art
 - [AndrewRadev/splitjoin.vim][sjv]
+- [treesj][treesj]
 
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim
+[treesj]: https://github.com/Wansmer/treesj
 
