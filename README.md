@@ -3,8 +3,10 @@
 Split or join list-like syntax constructs. like `g,` and `gj` from the venerable 
 old [vim-mode-plus][vmp].
 
-> looking for something more mature? [treesj][treesj]  
-> looking for something more bramvim? [splitjoin.vim][sjv] 
+> looking for something more...
+>  - mature? [treesj][treesj]  
+>  - generic? [ts-node-action][tna]  
+>  - bramvim? [splitjoin.vim][sjv] 
 
 ## 🚚 Installation
 
@@ -73,4 +75,5 @@ After:
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim
 [treesj]: https://github.com/Wansmer/treesj
+[tna]: https://github.com/CKolkey/ts-node-action/
 
