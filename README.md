@@ -1,4 +1,4 @@
-# splitjoin.nvim
+# 🪓🧷 splitjoin.nvim
 
 Split or join list-like syntax constructs. like `g,` and `gj` from the venerable 
 old [vim-mode-plus][vmp].
