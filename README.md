@@ -62,4 +62,10 @@ After:
 - **${lang}**: things
 - Tests
 
+
+## Prior Art
+- [AndrewRadev/splitjoin.vim][sjv]
+
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
+[sjv]: https://github.com/AndrewRadev/splitjoin.vim
+
