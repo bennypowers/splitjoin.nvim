@@ -1,53 +1,26 @@
 local M = {}
 
+---@class SplitjoinLanguageConfig
+---@field default_indent string
+---@field no_trailing_comma table<string, boolean>
+---@field pad table<string, boolean>
+---@field surround table<string, boolean>
+
 local DEFAULT_OPTIONS = {
-  default_indent = '  ',
-  no_trailing_comma = {
-    lua = {
-      parameters = true,
-      arguments = true,
-      variable_list = true,
-    },
-  },
-  pad = {
-    lua = {
-      table_constructor = true,
-    },
-    javascript = {
-      object = true,
-    },
-    css = {
-      block = true,
-    },
-  },
-  surround = {
-    lua = {
-      parameters = true,
-      arguments = true,
-      table_constructor = true,
-    },
-    javascript = {
-      object = true,
-      array = true,
-      arguments = true,
-      formal_parameters = true,
-    },
-    typescript = {
-      object = true,
-      array = true,
-      arguments = true,
-      formal_parameters = true,
-    },
-    css = {
-      block = true,
-    },
-  },
-  separators = {
-    css = {
-      block = ';',
-    },
+  languages = {
+    lua = require'languages.lua',
+    ecmascript = require'languages.ecmascript',
+    javascript = require'languages.javascript',
+    typescript = require'languages.typescript',
+    css = require'languages.css',
   },
 }
+
+for name, mod in pairs(DEFAULT_OPTIONS.languages) do
+  if mod.extends and DEFAULT_OPTIONS.languages[mod.extends] then
+    DEFAULT_OPTIONS.languages[name] = vim.tbl_deep_extend('keep', mod, DEFAULT_OPTIONS.languages[mod.extends])
+  end
+end
 
 local OPTIONS = DEFAULT_OPTIONS
 
@@ -67,16 +40,25 @@ local function dedupe(sep)
   end
 end
 
-local function get_config_for(config_table)
+local function get_config_for(key)
   return function(lang, type)
-    return config_table and config_table[lang] and config_table[lang][type]
+    local mod = DEFAULT_OPTIONS.languages[lang]
+    return mod and mod[key] and mod[key][type]
   end
 end
 
-local is_no_trailing_comma = get_config_for(OPTIONS.no_trailing_comma)
-local is_padded = get_config_for(OPTIONS.pad)
-local is_surround = get_config_for(OPTIONS.surround)
-local separators = get_config_for(OPTIONS.separators)
+local function get_option_for(key)
+  return function(lang, type)
+    local mod = OPTIONS.languages[lang]
+    return mod and mod.options and mod.options[key] and mod.options[key][type]
+  end
+end
+
+local is_no_trailing_comma = get_config_for('no_trailing_comma')
+local is_surround = get_config_for('surround')
+local separators = get_config_for('separators')
+
+local is_padded = get_option_for('pad')
 
 local function get_node(bufnr, winnr)
   local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
@@ -106,7 +88,9 @@ local function join(string, lang, type, sep, open, close, indent)
   if open and close then
     inner = string:sub(2, -2)
   end
-  local joined = inner:gsub('%s*', '')
+  local lines = vim.split(inner, '%'..sep..'\n%s*', { plain = true })
+        lines[#lines] = vim.trim(lines[#lines]):gsub(sep..'$', '')
+  local joined = table.concat(lines, sep)
   local list = joined:gsub(sep..'%s*', sep..' ')
   local padding = is_padded(lang, type) and ' ' or ''
   return { (open or '') .. padding .. vim.trim(list) .. padding .. (close or '') }
@@ -159,7 +143,8 @@ local function splitjoin(operation)
       open = false
       close = false
     end
-    local indent = OPTIONS.default_indent
+    local mod = OPTIONS.languages[lang]
+    local indent = mod and mod.default_indent or '  '
     local start_row, start_col, end_row, end_col = unpack(range)
     local replacements = vim.tbl_flatten(vim.tbl_map(normalize, operation(source,
                                                                           lang,

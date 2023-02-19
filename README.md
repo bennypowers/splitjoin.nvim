@@ -6,7 +6,7 @@ old [vim-mode-plus][vmp].
 > looking for something more...
 >  - mature? [treesj][treesj]  
 >  - generic? [ts-node-action][tna]  
->  - bramvim? [splitjoin.vim][sjv] 
+>  - bramvim? [splitjoin.vim][sjv]  
 
 ## 🚚 Installation
 
@@ -18,43 +18,78 @@ return { 'bennypowers/splitjoin.nvim',
     { 'g,', function() require'splitjoin'.split() end, desc = 'Split the object under cursor' },
   },
   opts = {
-    -- default_indent = '  ' -- default is two spaces
+    default_indent = '  ', -- default
+    languages = {}, -- see Options
   },
 }
 ```
 
 ## 🎁 Options
-| name                | type   | description                                  |
-| ----                | ----   | -----------                                  |
-| `default_indent`    | string | indent to apply when splitting               |
-| `pad`               | *      | pad these with a single space when joining   |
-| `no_trailing_comma` | *      | remove trailing commas when splitting these  |
-| `separators`        | *      | use this string as separator when operating  |
 
-`*` - Record<LanguageName, Record<NodeType, boolean>>
+There are currently two options, the global `default_indent` serves as a 
+fallback indent when a language does not have an indent configured. The 
+`languages` table lets you specify or modify language rules. Each language table 
+contains an `options` key which can have the following members:
 
-It's best to avoid configuring `no_trailing_comma` and `separators`. These 
-options may be removed for 1.0.
+| name                | type                  | description                                             |
+| ----                | ----                  | -----------                                             |
+| `default_indent`    | string                | indent to apply when splitting                          |
+| `pad`               | table<string, bool>   | pad these node types with a single space when joining   |
+
+Table values map node type names to bool or string. For example, these options 
+for CSS ensure that blocks are padded when joined, and indented by two spaces 
+when split.
+
+```lua
+---@return SplitjoinLanguageConfig
+return {
+  options = {
+    default_indent = '  ',
+    pad = {
+      block = true,
+    },
+  }
+}
+```
+
+In addition, a language table can specify the following config, which will be 
+overridden by the defaults:
+
+| name                | type                  | description                                             |
+| ----                | ----                  | -----------                                             |
+| `no_trailing_comma` | table<string, bool>   | remove trailing commas when splitting these             |
+| `separators`        | table<string, string> | use this string as separator when operating             | operating  |
+
+This is really only useful when [adding your own language](#adding-a-language).
 
 ### Default Options
 
 ```lua
 local DEFAULT_OPTIONS = {
   default_indent = '  ',
-  no_trailing_comma = {
+  languages = {
     lua = {
-      parameters = true,
-      arguments = true,
+      default_indent = '  ',
+      pad = {
+        table_constructor = true,
+      },
     },
-  },
-  pad = {
-    javascript = {
-      object = true,
+    ecmascript = {
+      default_indent = '  ',
+      pad = {
+        object = true,
+      },
     },
-  },
-  separators = {
     css = {
-      block = ';',
+      pad = {
+        block = true,
+      },
+    },
+    javascript = {
+      extends = 'ecmascript',
+    },
+    typescript = {
+      extends = 'ecmascript',
     },
   },
 }
@@ -96,18 +131,15 @@ After:
 
 ## Support
 
-- **ecmascript/typescript**: object, array, params, arguments
-- **lua**: table, params, arguments
+- **ecmascript**: object, array, params, arguments
+- **lua**: table, params, arguments, variable_lists
+- **css**: rules (blocks)
 
 ## TODO:
 - **HTML**: deeply prettify children
 - **${lang}**: things
 - Tests
 
-
-## Prior Art
-- [AndrewRadev/splitjoin.vim][sjv]
-- [treesj][treesj]
 
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim
