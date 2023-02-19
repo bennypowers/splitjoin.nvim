@@ -9,9 +9,15 @@ local DEFAULT_OPTIONS = {
     },
   },
   pad = {
+    lua = {
+      table_constructor = true,
+    },
     javascript = {
       object = true,
     },
+    css = {
+      block = true,
+    }
   },
   separators = {
     css = {
