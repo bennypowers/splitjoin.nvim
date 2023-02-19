@@ -23,6 +23,43 @@ return { 'bennypowers/splitjoin.nvim',
 }
 ```
 
+## 🎁 Options
+| name                | type   | description                                  |
+| ----                | ----   | -----------                                  |
+| `default_indent`    | string | indent to apply when splitting               |
+| `pad`               | *      | pad these with a single space when joining   |
+| `no_trailing_comma` | *      | remove trailing commas when splitting these  |
+| `separators`        | *      | use this string as separator when operating  |
+
+`*` - Record<LanguageName, Record<NodeType, boolean>>
+
+It's best to avoid configuring `no_trailing_comma` and `separators`. These 
+options may be removed for 1.0.
+
+### Default Options
+
+```lua
+local DEFAULT_OPTIONS = {
+  default_indent = '  ',
+  no_trailing_comma = {
+    lua = {
+      parameters = true,
+      arguments = true,
+    },
+  },
+  pad = {
+    javascript = {
+      object = true,
+    },
+  },
+  separators = {
+    css = {
+      block = ';',
+    },
+  },
+}
+```
+
 ## `split()`
 
 Separate the construct under the cursor into multiple lines
