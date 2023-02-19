@@ -52,10 +52,9 @@ end
 
 local is_no_trailing_comma = get_config_for(OPTIONS.no_trailing_comma)
 local is_padded = get_config_for(OPTIONS.pad)
-
 local separators = get_config_for(OPTIONS.separators)
 
-local function iter_caps(bufnr, winnr)
+local function get_node(bufnr, winnr)
   local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
   -- TODO: cache a reference per bufnr
   local tsparser = vim.treesitter.get_parser(bufnr)
@@ -78,7 +77,7 @@ local function iter_caps(bufnr, winnr)
 end
 
 ---@return string[]
-local function join_comma_line_separated_text(string, lang, type, sep, open, close, indent)
+local function join(string, lang, type, sep, open, close, indent)
   local joined = string:gsub('%s+', ' ')
   local inner = joined:sub(2, -2)
   local list = inner:gsub('^%s+', ''):gsub(sep..'%s+$', '')
@@ -87,7 +86,7 @@ local function join_comma_line_separated_text(string, lang, type, sep, open, clo
 end
 
 ---@return string[]
-local function split_comma_separated_text(string, lang, type, sep, open, close, indent)
+local function split(string, lang, type, sep, open, close, indent)
   local inner = string:sub(2, -2)
   local separated = vim.split(inner, sep, { plain = false, trimempty = true })
   local lines = vim.tbl_map(function(x)
@@ -103,11 +102,20 @@ local function split_comma_separated_text(string, lang, type, sep, open, close, 
   })
 end
 
+local function jump_to_node_end_at(bufnr, winnr, row, col)
+  local node = vim.treesitter.get_node_at_pos(bufnr,
+                                              row,
+                                              col,
+                                              { ignore_injections = false })
+  local _, _, end_row, end_col = node:range()
+  vim.api.nvim_win_set_cursor(winnr, { end_row + 1, end_col - 1 })
+end
+
 local function splitjoin(operation)
   return function(bufnr, winnr)
     bufnr = bufnr or 0
     winnr = winnr or 0
-    local node, range, source, lang = iter_caps(bufnr, winnr)
+    local node, range, source, lang = get_node(bufnr, winnr)
     if not (node and range and source and lang) then return end
     local type = node:type()
     local sep = separators(lang, type) or ','
@@ -129,16 +137,11 @@ local function splitjoin(operation)
                               end_col,
                               replacements)
 
-    local new_node = vim.treesitter.get_node_at_pos(bufnr,
-                                                    start_row,
-                                                    start_col,
-                                                    { ignore_injections = false })
-    local _, _, new_end_row, new_end_col = new_node:range()
-    vim.api.nvim_win_set_cursor(winnr, { new_end_row + 1, new_end_col - 1 })
+    jump_to_node_end_at(bufnr, winnr, start_row, start_col)
   end
 end
 
-M.join = splitjoin(join_comma_line_separated_text)
-M.split = splitjoin(split_comma_separated_text)
+M.join = splitjoin(join)
+M.split = splitjoin(split)
 
 return M;
