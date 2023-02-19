@@ -135,12 +135,6 @@ After:
 - **lua**: table, params, arguments, variable_lists
 - **css**: rules (blocks)
 
-## TODO:
-- **HTML**: deeply prettify children
-- **${lang}**: things
-- Tests
-
-
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim
 [treesj]: https://github.com/Wansmer/treesj
