@@ -6,6 +6,7 @@ local DEFAULT_OPTIONS = {
     lua = {
       parameters = true,
       arguments = true,
+      variable_list = true,
     },
   },
   pad = {
@@ -17,7 +18,29 @@ local DEFAULT_OPTIONS = {
     },
     css = {
       block = true,
-    }
+    },
+  },
+  surround = {
+    lua = {
+      parameters = true,
+      arguments = true,
+      table_constructor = true,
+    },
+    javascript = {
+      object = true,
+      array = true,
+      arguments = true,
+      formal_parameters = true,
+    },
+    typescript = {
+      object = true,
+      array = true,
+      arguments = true,
+      formal_parameters = true,
+    },
+    css = {
+      block = true,
+    },
   },
   separators = {
     css = {
@@ -52,6 +75,7 @@ end
 
 local is_no_trailing_comma = get_config_for(OPTIONS.no_trailing_comma)
 local is_padded = get_config_for(OPTIONS.pad)
+local is_surround = get_config_for(OPTIONS.surround)
 local separators = get_config_for(OPTIONS.separators)
 
 local function get_node(bufnr, winnr)
@@ -78,27 +102,37 @@ end
 
 ---@return string[]
 local function join(string, lang, type, sep, open, close, indent)
-  local joined = string:gsub('%s+', ' ')
-  local inner = joined:sub(2, -2)
-  local list = inner:gsub('^%s+', ''):gsub(sep..'%s+$', '')
+  local inner = string
+  if open and close then
+    inner = string:sub(2, -2)
+  end
+  local joined = inner:gsub('%s*', '')
+  local list = joined:gsub(sep..'%s*', sep..' ')
   local padding = is_padded(lang, type) and ' ' or ''
-  return { open .. padding .. vim.trim(list) .. padding .. close }
+  return { (open or '') .. padding .. vim.trim(list) .. padding .. (close or '') }
 end
 
 ---@return string[]
 local function split(string, lang, type, sep, open, close, indent)
-  local inner = string:sub(2, -2)
+  local inner = string
+  if open and close then
+    inner = string:sub(2, -2)
+  end
   local separated = vim.split(inner, sep, { plain = false, trimempty = true })
   local lines = vim.tbl_map(function(x)
-    return (indent..vim.trim(x)..sep)
+    local prefix = indent
+    if not open and not close then
+      prefix = ''
+    end
+    return (prefix..vim.trim(x)..sep)
   end, separated)
   if is_no_trailing_comma(lang, type) then
     lines[#lines] = lines[#lines]:gsub(sep, '')
   end
   return vim.tbl_filter(dedupe(sep), vim.tbl_flatten {
-    open,
+    open or '',
     lines,
-    close,
+    close or nil,
   })
 end
 
@@ -121,6 +155,10 @@ local function splitjoin(operation)
     local sep = separators(lang, type) or ','
     local open = source:sub(1, 1)
     local close = source:sub(-1)
+    if not is_surround(lang, type) then
+      open = false
+      close = false
+    end
     local indent = OPTIONS.default_indent
     local start_row, start_col, end_row, end_col = unpack(range)
     local replacements = vim.tbl_flatten(vim.tbl_map(normalize, operation(source,
