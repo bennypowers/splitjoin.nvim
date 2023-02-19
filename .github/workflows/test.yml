@@ -1,7 +1,14 @@
 name: CI
 on:
-  push:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - ready_for_review
+      - auto_merge_enabled
+  push:
+    branches:
+      - main
 
 jobs:
   tests:
