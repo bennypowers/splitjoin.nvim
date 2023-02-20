@@ -11,3 +11,5 @@ end
 local a, b, c = d
 
 a, b, c = d
+
+f(a, b, c, g(d, e))

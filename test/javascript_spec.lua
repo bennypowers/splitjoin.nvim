@@ -1,4 +1,4 @@
-local strings = require'plenary.strings'
+local d = require'plenary.strings'.dedent
 
 local H = require'test.helpers'
 
@@ -6,52 +6,64 @@ describe('javascript', function()
   H.make_suite(
     'javascript',
     'object',
-    '{ one: 1, two: 2, three: 3 }',
-    strings.dedent[[
+    d[[
+      { one: 1, two: 2, three: 3 }
+    ]],
+    d[[
       {
         one: 1,
         two: 2,
         three: 3,
-      }]],
+      }
+    ]],
     ','
   )
 
   H.make_suite(
     'javascript',
     'array',
-    '[1, 2, 3]',
-    strings.dedent[==[
+    d[=[
+      [1, 2, 3]
+    ]=],
+    d[=[
       [
         1,
         2,
         3,
-      ]]==],
+      ]
+    ]=],
     ','
   )
 
   H.make_suite(
     'javascript',
     'arrow params',
-    '(a, b, c) => 0',
-    strings.dedent[[
+    d[[
+      (a, b, c) => 0
+    ]],
+    d[[
       (
         a,
         b,
         c,
-      ) => 0]],
+      ) => 0
+    ]],
     ','
   )
 
   H.make_suite(
     'javascript',
     'arguments',
-    'call(a, b, c)',
-    strings.dedent[[
+    d[[
+      call(a, b, c)
+    ]],
+    d[[
       call(
         a,
         b,
         c,
-      )]],
+      )
+    ]],
     ','
   )
 
@@ -60,18 +72,18 @@ describe('javascript', function()
     'noop',
     'const noSplit = 1',
     'const noSplit = 1',
-    ','
+    '1'
   )
 
   H.make_suite(
     'javascript',
     'base indent',
-    strings.dedent[[
+    d[[
       function thingy(a, b, c) {
         return new Knaidlach(a, b, c);
       }
     ]],
-    strings.dedent[[
+    d[[
       function thingy(a, b, c) {
         return new Knaidlach(
           a,

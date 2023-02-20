@@ -1,5 +1,4 @@
-
-local strings = require'plenary.strings'
+local d = require'plenary.strings'.dedent
 
 local H = require'test.helpers'
 
@@ -7,34 +6,42 @@ describe('lua', function()
   H.make_suite(
     'lua',
     'list',
-    'local list = { 1, 2, 3 }',
-    strings.dedent[[
+    d[[
+      local list = { 1, 2, 3 }
+    ]],
+    d[[
       local list = {
         1,
         2,
         3,
-      }]],
+      }
+    ]],
     ','
   )
 
   H.make_suite(
     'lua',
     'table',
-    "local table = { a = 'a', b = 'b', c = 'c' }",
-    strings.dedent[[
+    d[[
+      local table = { a = 'a', b = 'b', c = 'c' }
+    ]],
+    d[[
       local table = {
         a = 'a',
         b = 'b',
         c = 'c',
-      }]],
+      }
+    ]],
     ','
   )
 
   H.make_suite(
     'lua',
     'mixed table',
-    "local mixed = { 1, 2, 3, a = 'a', b = 'b', c = 'c' }",
-    strings.dedent[[
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = 'b', c = 'c' }
+    ]],
+    d[[
       local mixed = {
         1,
         2,
@@ -42,68 +49,85 @@ describe('lua', function()
         a = 'a',
         b = 'b',
         c = 'c',
-      }]],
+      }
+    ]],
     ','
   )
 
   H.make_suite(
     'lua',
     'params',
-    'local function call(a, b, c) end',
-    strings.dedent[[
+    d[[
       local function call(
         a,
         b,
         c
-      ) end]],
+      ) end
+    ]],
+    d[[
+      local function call(
+        a,
+        b,
+        c
+      ) end
+    ]],
     ','
   )
 
   H.make_suite(
     'lua',
     'arguments',
-    'call(a, b, c)',
-    strings.dedent[[
+    d[[
+      call(a, b, c)
+    ]],
+    d[[
       call(
         a,
         b,
         c
-      )]],
+      )
+    ]],
     ','
   )
 
   H.make_suite(
     'lua',
     'variable_list',
-    'a, b, c = d',
-    strings.dedent[[
+    d[[
+      a, b, c = d
+    ]],
+    d[[
       a,
       b,
-      c = d]],
+      c = d
+    ]],
     ','
   )
 
   H.make_suite(
     'lua',
     'variable_list in declaration',
-    'local a, b, c = d',
-    strings.dedent[[
+    d[[
+      local a, b, c = d
+    ]],
+    d[[
       local
         a,
         b,
-        c = d]],
+        c = d
+    ]],
     ','
   )
 
   H.make_suite(
     'lua',
     'variable_list in indent',
-    strings.dedent[[
+    d[[
       local function params(a, b, c)
         a, b, c = mod(a, b, c)
       end
     ]],
-    strings.dedent[[
+    d[[
       local function params(a, b, c)
         a,
         b,
@@ -112,5 +136,21 @@ describe('lua', function()
     ]],
     { 2, 4 }
   )
+
+  H.skip(
+    'lua',
+    'inner arguments',
+    d[[
+      f(a, b, c, g(d, e))
+    ]],
+    d[[
+      f(a, b, c, g(
+        d,
+        e
+      ))
+    ]],
+    { 1, 14 }
+  )
+
 
 end)
