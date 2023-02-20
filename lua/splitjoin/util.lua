@@ -61,13 +61,13 @@ end
 
 local get_node_at_pos = vim.treesitter.get_node_at_pos
 
-function M.jump_to_node_end_at(op, node, bufnr, winnr, row, col, row_offset, col_offset)
-  local found, node = pcall(get_node_at_pos, bufnr,
+function M.jump_to_node_end_at(op, orig_node, bufnr, winnr, row, col, row_offset, col_offset)
+  local found, new_node = pcall(get_node_at_pos, bufnr,
                                              row,
                                              col,
                                              { ignore_injections = false })
-  if found then
-    local _, _, end_row, end_col = node:range()
+  if found and new_node then
+    local _, _, end_row, end_col = new_node:range()
 
     vim.api.nvim_win_set_cursor(winnr, {
       end_row + (row_offset or 1),
