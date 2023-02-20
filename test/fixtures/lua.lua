@@ -8,4 +8,6 @@ local function params(a, b, c)
   a, b, c = mod(a, b, c)
 end
 
+local a, b, c = d
+
 a, b, c = d

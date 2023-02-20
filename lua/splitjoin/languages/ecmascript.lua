@@ -7,9 +7,9 @@ return {
     },
   },
   surround = {
-    object = true,
-    array = true,
-    arguments = true,
-    formal_parameters = true,
+    object = { '{', '}' },
+    array = { '[', ']' },
+    arguments = { '(', ')' },
+    formal_parameters = { '(', ')' },
   },
 }

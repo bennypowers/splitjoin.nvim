@@ -71,8 +71,7 @@ describe('typescript', function()
       type A =
         | 1
         | 2
-        | 3;
-      )]],
+        | 3;]],
     '|'
   )
 
