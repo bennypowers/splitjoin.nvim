@@ -12,8 +12,8 @@ return {
     union_type = '|',
   },
   before = {
-    union_type = function(lines, node, op)
-      if op == 'split' and U.is_sep_first('typescript', node:type()) then
+    union_type = function(op, node, base_indent, lines)
+      if op == 'split' and U.node_is_sep_first('typescript', node:type()) then
         table.insert(lines, 1, '')
       end
       return lines

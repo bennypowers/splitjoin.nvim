@@ -95,4 +95,22 @@ describe('lua', function()
     ','
   )
 
+  H.make_suite(
+    'lua',
+    'variable_list in indent',
+    strings.dedent[[
+      local function params(a, b, c)
+        a, b, c = mod(a, b, c)
+      end
+    ]],
+    strings.dedent[[
+      local function params(a, b, c)
+        a,
+        b,
+        c = mod(a, b, c)
+      end
+    ]],
+    { 2, 4 }
+  )
+
 end)

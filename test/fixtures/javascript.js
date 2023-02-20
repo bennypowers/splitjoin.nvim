@@ -7,3 +7,7 @@ const fn = (a, b, c) => 0;
 call(a, b, c)
 
 const notObj = 1
+
+function thingy() {
+  return new Knaidlach(a, b, c);
+}

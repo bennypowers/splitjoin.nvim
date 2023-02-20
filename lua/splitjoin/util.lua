@@ -38,12 +38,51 @@ function M.identity(x)
   return x
 end
 
+function M.split(str, sep, opts)
+  opts = vim.tbl_extend('keep', opts or {}, { plain = true, trimempty = true })
+  return vim.split(str, sep, opts)
+end
+
+function M.dedupe(sep)
+  return function(line)
+    return not line:find('^%s*'..sep..'%s*$')
+  end
+end
+
+function M.add_sep(lang, type, base, indent, sep)
+  base = base or ''
+  if M.node_is_sep_first(lang, type) then
+    return function(x)
+      return (base..indent..sep..' '..vim.trim(x))
+    end
+  else
+    return function(x)
+      return (base..indent..vim.trim(x)..sep)
+    end
+  end
+
+end
+
+function M.get_line(bufnr, row)
+  local line = unpack(vim.api.nvim_buf_get_lines(bufnr,
+                                                 row,
+                                                 row + 1,
+                                                 true))
+  return line
+end
+
+function M.get_joined(lang, type, sep, joined)
+  if M.node_is_sep_first(lang, type) then
+    return joined:gsub('%s*%'..sep, sep)
+  else
+    return joined:gsub(sep..'%s*', sep..' ')
+  end
+end
+
+
 --- trim first line
 function M.trim_end(op, node, bufnr, winnr, row, col)
-  local first_line = unpack(vim.api.nvim_buf_get_lines(bufnr,
-                                                       row,
-                                                       row + 1,
-                                                       true))
+  local first_line = M.get_line(bufnr, row)
 
   local trimmed = first_line:gsub('%s+$', '')
   vim.api.nvim_buf_set_lines(bufnr,
@@ -76,11 +115,22 @@ function M.jump_to_node_end_at(op, orig_node, bufnr, winnr, row, col, row_offset
   end
 end
 
-M.is_sep_first = get_option_for('sep_first')
-M.is_padded = get_option_for('pad')
-M.is_no_trailing_comma = get_config_for('no_trailing_comma')
+function M.is_lengthy(str)
+  return str:len() > 0
+end
+
+function M.normalize_item(sep)
+  return function(x)
+    return vim.trim(x:gsub(sep, ''))
+  end
+end
+
+M.node_is_sep_first = get_option_for('sep_first')
+M.node_is_padded = get_option_for('pad')
+M.node_is_no_trailing_comma = get_config_for('no_trailing_comma')
+
 M.get_config_after = get_config_for('after', M.jump_to_node_end_at)
-M.get_config_before = get_config_for('before', M.identity)
+M.get_config_before = get_config_for('before', function(_, _, _, lines) return lines end)
 M.get_config_separators = get_config_for('separators')
 M.get_config_indent = get_config_for('default_indent')
 
