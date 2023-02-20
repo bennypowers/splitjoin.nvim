@@ -3,6 +3,7 @@ local d = require'plenary.strings'.dedent
 local H = require'test.helpers'
 
 describe('lua', function()
+
   H.make_suite(
     'lua',
     'list',
@@ -17,6 +18,21 @@ describe('lua', function()
       }
     ]],
     ','
+  )
+
+  H.make_suite(
+    'lua',
+    'inner list',
+    d[[
+      local list = { 1, 2, { 3, 4 } }
+    ]],
+    d[[
+      local list = { 1, 2, {
+        3,
+        4,
+      } }
+    ]],
+    '3'
   )
 
   H.make_suite(
@@ -37,6 +53,25 @@ describe('lua', function()
 
   H.make_suite(
     'lua',
+    'inner table',
+    d[[
+      local table = { a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
+    ]],
+    d[[
+      local table = {
+        a = 'a',
+        b = {
+          d = 'd',
+          e = 'e',
+        },
+        c = 'c',
+      }
+    ]],
+    'd'
+  )
+
+  H.make_suite(
+    'lua',
     'mixed table',
     d[[
       local mixed = { 1, 2, 3, a = 'a', b = 'b', c = 'c' }
@@ -48,6 +83,28 @@ describe('lua', function()
         3,
         a = 'a',
         b = 'b',
+        c = 'c',
+      }
+    ]],
+    ','
+  )
+
+  H.make_suite(
+    'lua',
+    'inner mixed table',
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
+    ]],
+    d[[
+      local mixed = {
+        1,
+        2,
+        3,
+        a = 'a',
+        b = {
+          d = 'd',
+          e = 'e',
+        },
         c = 'c',
       }
     ]],
@@ -137,7 +194,7 @@ describe('lua', function()
     { 2, 4 }
   )
 
-  H.skip(
+  H.make_suite(
     'lua',
     'inner arguments',
     d[[
