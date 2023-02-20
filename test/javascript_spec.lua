@@ -63,4 +63,24 @@ describe('javascript', function()
     ','
   )
 
+  H.make_suite(
+    'javascript',
+    'base indent',
+    strings.dedent[[
+      function thingy(a, b, c) {
+        return new Knaidlach(a, b, c);
+      }
+    ]],
+    strings.dedent[[
+      function thingy(a, b, c) {
+        return new Knaidlach(
+          a,
+          b,
+          c,
+        );
+      }
+    ]],
+    { 2, 24 }
+  )
+
 end)

@@ -20,7 +20,7 @@ function M.read_lines(path)
   return lines
 end
 
-function M.make_suite(lang, name, fixture, split_expected, sep)
+function M.make_suite(lang, name, fixture, split_expected, go_to)
   local assert = require 'luassert'
   local splitjoin = require'splitjoin'
 
@@ -29,18 +29,26 @@ function M.make_suite(lang, name, fixture, split_expected, sep)
       bufnr = vim.api.nvim_create_buf(true, false)
       vim.api.nvim_win_set_buf(0, bufnr)
       vim.opt.filetype = lang
-      vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, {fixture})
-      vim.cmd.norm('f'..sep)
+      local lines = vim.split(fixture, '\n', { plain = true, trimempty = false })
+      vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, lines)
+      if type(go_to) == 'string' then
+        vim.cmd.norm('f'..go_to)
+      elseif type(go_to) == 'table' then
+        vim.api.nvim_win_set_cursor(0, go_to)
+      end
     end)
+
     after_each(function()
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
+
     it('splits', function()
       splitjoin.split()
       assert.same(split_expected,
                   table.concat(vim.api.nvim_buf_get_text(bufnr, 0, 0, -1, -1, {}), '\n'))
     end)
-    it('splits and joins', function()
+
+    it('and rejoins', function()
       splitjoin.split()
       splitjoin.join()
       assert.same(fixture,
