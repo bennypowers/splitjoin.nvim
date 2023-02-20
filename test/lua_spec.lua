@@ -83,4 +83,16 @@ describe('lua', function()
     ','
   )
 
+  H.make_suite(
+    'lua',
+    'variable_list in declaration',
+    'local a, b, c = d',
+    strings.dedent[[
+      local
+        a,
+        b,
+        c = d]],
+    ','
+  )
+
 end)

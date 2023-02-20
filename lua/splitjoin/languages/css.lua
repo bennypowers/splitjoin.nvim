@@ -7,7 +7,7 @@ return {
     },
   },
   surround = {
-    block = true,
+    block = { '{', '}' },
   },
   separators = {
     block = ';',

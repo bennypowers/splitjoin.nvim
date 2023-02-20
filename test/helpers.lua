@@ -37,14 +37,14 @@ function M.make_suite(lang, name, fixture, split_expected, sep)
     end)
     it('splits', function()
       splitjoin.split()
-      local contents = table.concat(vim.api.nvim_buf_get_text(bufnr, 0, 0, -1, -1, {}), '\n')
-      assert.same(contents, split_expected)
+      assert.same(split_expected,
+                  table.concat(vim.api.nvim_buf_get_text(bufnr, 0, 0, -1, -1, {}), '\n'))
     end)
     it('splits and joins', function()
       splitjoin.split()
       splitjoin.join()
-      local contents = table.concat(vim.api.nvim_buf_get_text(bufnr, 0, 0, -1, -1, {}), '\n')
-      assert.same(contents, fixture)
+      assert.same(fixture,
+                  table.concat(vim.api.nvim_buf_get_text(bufnr, 0, 0, -1, -1, {}), '\n'))
     end)
   end)
 end
