@@ -71,11 +71,9 @@ local function split(string, lang, type, sep, open, close, indent, base_indent)
   local inner = string
   if open and close then inner = string:sub(2, -2) end
   local lines = map(U.add_sep(lang, type, base_indent, indent, sep), U.split(inner, sep))
-
   if U.node_is_no_trailing_comma(lang, type) then
     lines[#lines] = lines[#lines]:gsub(sep, '')
   end
-
   return filter(U.dedupe(sep), flatten {
     open or {},
     lines,
@@ -90,6 +88,7 @@ local function splitjoin(operation)
     winnr = winnr or 0
     local node, range, source, lang = get_node(bufnr, winnr)
     if node then
+      if op == 'join' and not source:find'\n' then return end
       local type = node:type()
       local after = U.get_config_after(lang, type)
       local before = U.get_config_before(lang, type)
