@@ -1,77 +1,49 @@
-local strings = require'plenary.strings'
+local d = require'plenary.strings'.dedent
 
 local H = require'test.helpers'
 
-describe('typescript', function()
-  H.make_suite(
-    'typescript',
-    'object',
-    '{ one: 1, two: 2, three: 3 }',
-    strings.dedent[[
-      {
-        one: 1,
-        two: 2,
-        three: 3,
-      }]],
-    ','
-  )
+local lang = 'typescript'
 
-  H.make_suite(
-    'typescript',
-    'array',
-    '[1, 2, 3]',
-    strings.dedent[==[
+describe(lang, function()
+
+  H.make_suite(lang, 'array',
+    d[=[
+      [1, 2, 3]
+    ]=],
+    d[=[
       [
         1,
         2,
         3,
-      ]]==],
+      ]
+    ]=],
     ','
   )
 
-  H.make_suite(
-    'typescript',
-    'arrow params',
-    '(a, b, c) => 0',
-    strings.dedent[[
+  H.make_suite(lang, 'arrow params',
+    d[[
+      (a: A, b: B, c: C) => 0
+    ]],
+    d[[
       (
-        a,
-        b,
-        c,
-      ) => 0]],
+        a: A,
+        b: B,
+        c: C,
+      ) => 0
+    ]],
     ','
   )
 
-  H.make_suite(
-    'typescript',
-    'arguments',
-    'call(a, b, c)',
-    strings.dedent[[
-      call(
-        a,
-        b,
-        c,
-      )]],
-    ','
-  )
-
-  H.make_suite(
-    'typescript',
-    'noop',
-    'const noSplit = 1',
-    'const noSplit = 1',
-    ','
-  )
-
-  H.make_suite(
-    'typescript',
-    'unions',
-    'type A = 1|2|3;',
-    strings.dedent[[
+  H.make_suite(lang, 'unions',
+    d[[
+      type A = 1|2|3;
+    ]],
+    d[[
       type A =
         | 1
         | 2
-        | 3;]],
+        | 3;
+    ]],
     '|'
   )
 

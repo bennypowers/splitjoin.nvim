@@ -1,77 +1,86 @@
-local strings = require'plenary.strings'
+local d = require'plenary.strings'.dedent
 
 local H = require'test.helpers'
 
-describe('javascript', function()
-  H.make_suite(
-    'javascript',
+local lang = 'javascript'
+
+describe(lang, function()
+
+  H.make_suite(lang,
     'object',
-    '{ one: 1, two: 2, three: 3 }',
-    strings.dedent[[
+    d[[
+      { one: 1, two: 2, three: 3 }
+    ]],
+    d[[
       {
         one: 1,
         two: 2,
         three: 3,
-      }]],
+      }
+    ]],
     ','
   )
 
-  H.make_suite(
-    'javascript',
+  H.make_suite(lang,
     'array',
-    '[1, 2, 3]',
-    strings.dedent[==[
+    d[=[
+      [1, 2, 3]
+    ]=],
+    d[=[
       [
         1,
         2,
         3,
-      ]]==],
+      ]
+    ]=],
     ','
   )
 
-  H.make_suite(
-    'javascript',
+  H.make_suite(lang,
     'arrow params',
-    '(a, b, c) => 0',
-    strings.dedent[[
+    d[[
+      (a, b, c) => 0
+    ]],
+    d[[
       (
         a,
         b,
         c,
-      ) => 0]],
+      ) => 0
+    ]],
     ','
   )
 
-  H.make_suite(
-    'javascript',
+  H.make_suite(lang,
     'arguments',
-    'call(a, b, c)',
-    strings.dedent[[
+    d[[
+      call(a, b, c)
+    ]],
+    d[[
       call(
         a,
         b,
         c,
-      )]],
+      )
+    ]],
     ','
   )
 
-  H.make_suite(
-    'javascript',
+  H.make_suite(lang,
     'noop',
     'const noSplit = 1',
     'const noSplit = 1',
-    ','
+    '1'
   )
 
-  H.make_suite(
-    'javascript',
+  H.make_suite(lang,
     'base indent',
-    strings.dedent[[
+    d[[
       function thingy(a, b, c) {
         return new Knaidlach(a, b, c);
       }
     ]],
-    strings.dedent[[
+    d[[
       function thingy(a, b, c) {
         return new Knaidlach(
           a,
@@ -81,6 +90,48 @@ describe('javascript', function()
       }
     ]],
     { 2, 24 }
+  )
+
+  H.make_suite(lang,
+    'inner object',
+    d[[
+      { one: 1, two: 2, three: { four: 4, five: 5 } }
+    ]],
+    d[[
+      { one: 1, two: 2, three: {
+        four: 4,
+        five: 5,
+      } }
+    ]],
+    '4'
+  )
+
+  H.make_suite(lang,
+    'inner array',
+    d[=[
+      [1, 2, [3, 4]]
+    ]=],
+    d[=[
+      [1, 2, [
+        3,
+        4,
+      ]]
+    ]=],
+    '3'
+  )
+
+  H.make_suite(lang,
+    'inner arguments',
+    d[[
+      f(a, b, c, g(d, e))
+    ]],
+    d[[
+      f(a, b, c, g(
+        d,
+        e,
+      ))
+    ]],
+    'd'
   )
 
 end)

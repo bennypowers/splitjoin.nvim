@@ -131,6 +131,7 @@ M.node_is_no_trailing_comma = get_config_for('no_trailing_comma')
 
 M.get_config_after = get_config_for('after', M.jump_to_node_end_at)
 M.get_config_before = get_config_for('before', function(_, _, _, lines) return lines end)
+M.get_config_operative_node = get_config_for('operative_node')
 M.get_config_separators = get_config_for('separators')
 M.get_config_indent = get_config_for('default_indent')
 

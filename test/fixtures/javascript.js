@@ -11,3 +11,5 @@ const notObj = 1
 function thingy() {
   return new Knaidlach(a, b, c);
 }
+
+f(a, b, g(c, d))

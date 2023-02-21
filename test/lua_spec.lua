@@ -1,40 +1,44 @@
-
-local strings = require'plenary.strings'
+local d = require'plenary.strings'.dedent
 
 local H = require'test.helpers'
 
-describe('lua', function()
-  H.make_suite(
-    'lua',
-    'list',
-    'local list = { 1, 2, 3 }',
-    strings.dedent[[
+local lang = 'lua'
+
+describe(lang, function()
+
+  H.make_suite(lang, 'list',
+    d[[
+      local list = { 1, 2, 3 }
+    ]],
+    d[[
       local list = {
         1,
         2,
         3,
-      }]],
+      }
+    ]],
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'table',
-    "local table = { a = 'a', b = 'b', c = 'c' }",
-    strings.dedent[[
+  H.make_suite(lang, 'table',
+    d[[
+      local table = { a = 'a', b = 'b', c = 'c' }
+    ]],
+    d[[
       local table = {
         a = 'a',
         b = 'b',
         c = 'c',
-      }]],
+      }
+    ]],
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'mixed table',
-    "local mixed = { 1, 2, 3, a = 'a', b = 'b', c = 'c' }",
-    strings.dedent[[
+  H.make_suite(lang, 'mixed table',
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = 'b', c = 'c' }
+    ]],
+    d[[
       local mixed = {
         1,
         2,
@@ -42,68 +46,75 @@ describe('lua', function()
         a = 'a',
         b = 'b',
         c = 'c',
-      }]],
+      }
+    ]],
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'params',
-    'local function call(a, b, c) end',
-    strings.dedent[[
+  H.make_suite(lang, 'params',
+    d[[
       local function call(
         a,
         b,
         c
-      ) end]],
+      ) end
+    ]],
+    d[[
+      local function call(
+        a,
+        b,
+        c
+      ) end
+    ]],
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'arguments',
-    'call(a, b, c)',
-    strings.dedent[[
+  H.make_suite(lang, 'arguments',
+    d[[
+      call(a, b, c)
+    ]],
+    d[[
       call(
         a,
         b,
         c
-      )]],
+      )
+    ]],
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'variable_list',
-    'a, b, c = d',
-    strings.dedent[[
+  H.make_suite(lang, 'variable_list',
+    d[[
+      a, b, c = d
+    ]],
+    d[[
       a,
       b,
-      c = d]],
+      c = d
+    ]],
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'variable_list in declaration',
-    'local a, b, c = d',
-    strings.dedent[[
+  H.make_suite(lang, 'variable_list in declaration',
+    d[[
+      local a, b, c = d
+    ]],
+    d[[
       local
         a,
         b,
-        c = d]],
+        c = d
+    ]],
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'variable_list in indent',
-    strings.dedent[[
+  H.make_suite(lang, 'variable_list in indent',
+    d[[
       local function params(a, b, c)
         a, b, c = mod(a, b, c)
       end
     ]],
-    strings.dedent[[
+    d[[
       local function params(a, b, c)
         a,
         b,
@@ -111,6 +122,71 @@ describe('lua', function()
       end
     ]],
     { 2, 4 }
+  )
+
+  H.make_suite(lang, 'inner list',
+    d[[
+      local list = { 1, 2, { 3, 4 } }
+    ]],
+    d[[
+      local list = { 1, 2, {
+        3,
+        4,
+      } }
+    ]],
+    '3'
+  )
+
+  H.make_suite(lang, 'inner table',
+    d[[
+      local table = { a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
+    ]],
+    d[[
+      local table = { a = 'a', b = {
+        d = 'd',
+        e = 'e',
+      }, c = 'c' }
+    ]],
+    'd'
+  )
+
+  H.make_suite(lang, 'inner mixed table',
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
+    ]],
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = {
+        d = 'd',
+        e = 'e',
+      }, c = 'c' }
+    ]],
+    { 1, 43 }
+  )
+
+  H.make_suite(lang, 'inner double mixed table',
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = { d = 'd', e = 'e' }, c = { 4, 5, 6 } }
+    ]],
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = {
+        d = 'd',
+        e = 'e',
+      }, c = { 4, 5, 6 } }
+    ]],
+    { 1, 43 }
+  )
+
+  H.make_suite(lang, 'inner arguments',
+    d[[
+      f(a, b, c, g(d, e))
+    ]],
+    d[[
+      f(a, b, c, g(
+        d,
+        e
+      ))
+    ]],
+    { 1, 14 }
   )
 
 end)

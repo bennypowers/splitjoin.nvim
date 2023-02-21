@@ -2,4 +2,4 @@
 nvim --version
 nvim --headless \
   -u test/init.lua \
-  -c "PlenaryBustedDirectory test/ { minimal_init = 'test/init.lua', sequential = true }"
+  -c "lua require'plenary.test_harness'.test_directory('test/', {minimal_init='test/init.lua',sequential=true})"
