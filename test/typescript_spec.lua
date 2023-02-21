@@ -2,11 +2,11 @@ local d = require'plenary.strings'.dedent
 
 local H = require'test.helpers'
 
-describe('typescript', function()
+local lang = 'typescript'
 
-  H.make_suite(
-    'typescript',
-    'array',
+describe(lang, function()
+
+  H.make_suite(lang, 'array',
     d[=[
       [1, 2, 3]
     ]=],
@@ -20,9 +20,7 @@ describe('typescript', function()
     ','
   )
 
-  H.make_suite(
-    'typescript',
-    'arrow params',
+  H.make_suite(lang, 'arrow params',
     d[[
       (a: A, b: B, c: C) => 0
     ]],
@@ -36,9 +34,7 @@ describe('typescript', function()
     ','
   )
 
-  H.make_suite(
-    'typescript',
-    'unions',
+  H.make_suite(lang, 'unions',
     d[[
       type A = 1|2|3;
     ]],

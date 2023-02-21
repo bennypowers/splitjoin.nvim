@@ -34,15 +34,25 @@ local function get_node(bufnr, winnr)
   local langtree = tsparser:language_for_range { row, col, row, col };
   local lang = langtree:lang()
   local query = vim.treesitter.get_query(lang, 'splitjoin')
+  local nodes = {}
   if query then
     for _, node, _ in query:iter_captures(tstree:root(), bufnr, row - 1, row) do
       if vim.treesitter.is_in_node_range(node, row - 1, col) then
-        local start_row, start_col, end_row, end_col = node:range()
-        local range = { start_row, start_col, end_row, end_col }
-        local source = vim.treesitter.get_node_text(node, bufnr)
-        return node, range, source, lang
+        table.insert(nodes, node)
       end
     end
+  end
+
+  local node = nodes[#nodes]
+  if node then
+    local getter = U.get_config_operative_node(lang, node:type())
+    if getter then
+      node = getter(node) or node
+    end
+    local start_row, start_col, end_row, end_col = node:range()
+    local range = { start_row, start_col, end_row, end_col }
+    local source = vim.treesitter.get_node_text(node, bufnr)
+    return node, range, source, lang
   end
 end
 

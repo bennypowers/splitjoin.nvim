@@ -2,11 +2,11 @@ local d = require'plenary.strings'.dedent
 
 local H = require'test.helpers'
 
-describe('lua', function()
+local lang = 'lua'
 
-  H.make_suite(
-    'lua',
-    'list',
+describe(lang, function()
+
+  H.make_suite(lang, 'list',
     d[[
       local list = { 1, 2, 3 }
     ]],
@@ -20,24 +20,7 @@ describe('lua', function()
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'inner list',
-    d[[
-      local list = { 1, 2, { 3, 4 } }
-    ]],
-    d[[
-      local list = { 1, 2, {
-        3,
-        4,
-      } }
-    ]],
-    '3'
-  )
-
-  H.make_suite(
-    'lua',
-    'table',
+  H.make_suite(lang, 'table',
     d[[
       local table = { a = 'a', b = 'b', c = 'c' }
     ]],
@@ -51,28 +34,7 @@ describe('lua', function()
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'inner table',
-    d[[
-      local table = { a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
-    ]],
-    d[[
-      local table = {
-        a = 'a',
-        b = {
-          d = 'd',
-          e = 'e',
-        },
-        c = 'c',
-      }
-    ]],
-    'd'
-  )
-
-  H.make_suite(
-    'lua',
-    'mixed table',
+  H.make_suite(lang, 'mixed table',
     d[[
       local mixed = { 1, 2, 3, a = 'a', b = 'b', c = 'c' }
     ]],
@@ -89,31 +51,7 @@ describe('lua', function()
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'inner mixed table',
-    d[[
-      local mixed = { 1, 2, 3, a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
-    ]],
-    d[[
-      local mixed = {
-        1,
-        2,
-        3,
-        a = 'a',
-        b = {
-          d = 'd',
-          e = 'e',
-        },
-        c = 'c',
-      }
-    ]],
-    ','
-  )
-
-  H.make_suite(
-    'lua',
-    'params',
+  H.make_suite(lang, 'params',
     d[[
       local function call(
         a,
@@ -131,9 +69,7 @@ describe('lua', function()
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'arguments',
+  H.make_suite(lang, 'arguments',
     d[[
       call(a, b, c)
     ]],
@@ -147,9 +83,7 @@ describe('lua', function()
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'variable_list',
+  H.make_suite(lang, 'variable_list',
     d[[
       a, b, c = d
     ]],
@@ -161,9 +95,7 @@ describe('lua', function()
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'variable_list in declaration',
+  H.make_suite(lang, 'variable_list in declaration',
     d[[
       local a, b, c = d
     ]],
@@ -176,9 +108,7 @@ describe('lua', function()
     ','
   )
 
-  H.make_suite(
-    'lua',
-    'variable_list in indent',
+  H.make_suite(lang, 'variable_list in indent',
     d[[
       local function params(a, b, c)
         a, b, c = mod(a, b, c)
@@ -194,9 +124,59 @@ describe('lua', function()
     { 2, 4 }
   )
 
-  H.make_suite(
-    'lua',
-    'inner arguments',
+  H.make_suite(lang, 'inner list',
+    d[[
+      local list = { 1, 2, { 3, 4 } }
+    ]],
+    d[[
+      local list = { 1, 2, {
+        3,
+        4,
+      } }
+    ]],
+    '3'
+  )
+
+  H.make_suite(lang, 'inner table',
+    d[[
+      local table = { a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
+    ]],
+    d[[
+      local table = { a = 'a', b = {
+        d = 'd',
+        e = 'e',
+      }, c = 'c' }
+    ]],
+    'd'
+  )
+
+  H.make_suite(lang, 'inner mixed table',
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = { d = 'd', e = 'e' }, c = 'c' }
+    ]],
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = {
+        d = 'd',
+        e = 'e',
+      }, c = 'c' }
+    ]],
+    { 1, 43 }
+  )
+
+  H.make_suite(lang, 'inner double mixed table',
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = { d = 'd', e = 'e' }, c = { 4, 5, 6 } }
+    ]],
+    d[[
+      local mixed = { 1, 2, 3, a = 'a', b = {
+        d = 'd',
+        e = 'e',
+      }, c = { 4, 5, 6 } }
+    ]],
+    { 1, 43 }
+  )
+
+  H.make_suite(lang, 'inner arguments',
     d[[
       f(a, b, c, g(d, e))
     ]],
@@ -208,6 +188,5 @@ describe('lua', function()
     ]],
     { 1, 14 }
   )
-
 
 end)
