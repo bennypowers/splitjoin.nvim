@@ -100,10 +100,9 @@ describe(lang, function()
       local a, b, c = d
     ]],
     d[[
-      local
-        a,
-        b,
-        c = d
+      local a,
+            b,
+            c = d
     ]],
     ','
   )
@@ -119,6 +118,22 @@ describe(lang, function()
         a,
         b,
         c = mod(a, b, c)
+      end
+    ]],
+    { 2, 4 }
+  )
+
+  H.make_suite(lang, 'variable_list declaration in indent',
+    d[[
+      local function params(a, b, c)
+        local a, b, c = mod(a, b, c)
+      end
+    ]],
+    d[[
+      local function params(a, b, c)
+        local a,
+              b,
+              c = mod(a, b, c)
       end
     ]],
     { 2, 4 }

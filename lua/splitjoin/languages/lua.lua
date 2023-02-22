@@ -37,9 +37,27 @@ return {
                                :gsub('%s*then%s+', ' then ')
                                :gsub('%s*elseif%s+', ' elseif ')
                                :gsub('%s*else%s+', ' else ')
-                               :gsub('%s*end%s*', ' end'))
+                               :gsub('^%s*end%s*$', ' end'))
       end
     },
+
+    variable_list = {
+      split = function(node)
+        local source = vim.treesitter.get_node_text(node, 0)
+        local is_variable_decl = U.is_child_of('variable_declaration', node)
+        local indent = is_variable_decl and '      ' or ''
+        local new = source:gsub(',%s*',',\n'..indent)
+        U.replace_node(node, new)
+        U.cursor_to_node_end(node)
+        if is_variable_decl then U.trim_node_line_end(node) end
+      end,
+      join = function(node)
+        local source = vim.treesitter.get_node_text(node, 0)
+        local next = source:gsub('%s+', ' ')
+        U.replace_node(node, next)
+        U.cursor_to_node_end(node)
+      end
+    }
   },
 
   no_trailing_comma = {
@@ -55,45 +73,4 @@ return {
     table_constructor = { '{', '}' },
   },
 
-  before = {
-    variable_list = function(op, node, base_indent, lines)
-      if op == 'split' then
-        local parent = node:parent()
-        local gp = parent and parent:parent()
-        if gp and gp:type() == 'variable_declaration' then
-          table.insert(lines, 1, '')
-          return lines
-        else
-          local next = vim.tbl_map(function(x)
-            return x:gsub('^%s*', base_indent or '')
-          end, lines)
-          next[1] = next[1]:gsub('^%s+', '')
-          return next
-        end
-      else
-        return lines
-      end
-    end
-  },
-
-  after = {
-    variable_list = function(op, node, bufnr, winnr, row, col)
-      local parent = node:parent()
-      local gp = parent and parent:parent()
-      if op == 'split' then
-        if gp and gp:type() == 'variable_declaration' then
-          U.trim_end(op, node, bufnr, winnr, row, col)
-        else
-          U.jump_to_node_end_at(op, node, bufnr, winnr, row, col)
-        end
-      else -- 'join'
-        if gp and gp:type() == 'variable_declaration' then
-          -- vim.cmd.norm'k"_dd'
-          vim.cmd.norm'kJl'
-        else
-          U.jump_to_node_end_at(op, node, bufnr, winnr, row, col)
-        end
-      end
-    end
-  }
 }
