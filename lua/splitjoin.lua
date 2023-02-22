@@ -81,11 +81,11 @@ local function split(string, lang, type, sep, open, close, indent, base_indent)
   })
 end
 
-local function splitjoin(operation)
-  local op = operation == join and 'join' or 'split'
-  return function(bufnr, winnr)
-    bufnr = bufnr or 0
-    winnr = winnr or 0
+local function splitjoin(op)
+  local operation = op == 'join' and join or split
+  return function()
+    local bufnr = 0
+    local winnr = 0
     local node, range, source, lang = get_node(bufnr, winnr)
     if node then
       if op == 'join' and not source:find'\n' then return end
@@ -131,7 +131,7 @@ local function splitjoin(operation)
   end
 end
 
-M.join = splitjoin(join)
-M.split = splitjoin(split)
+M.join = splitjoin('join')
+M.split = splitjoin('split')
 
 return M;
