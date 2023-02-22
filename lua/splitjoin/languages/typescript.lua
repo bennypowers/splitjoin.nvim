@@ -16,6 +16,13 @@ return {
   separators = {
     union_type = '|',
   },
+  surround = {
+    type_parameters = {'<', '>'},
+    type_arguments = {'<', '>'},
+  },
+  no_trailing_comma = {
+    type_arguments = true,
+  },
 
   -- hooks
   operative_node = {
