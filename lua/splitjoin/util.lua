@@ -35,38 +35,6 @@ end
 
 --- OPERATION HELPERS
 -- TODO: Remove these in favour of node helpers and default handlers
-function M.trim_end(op, node, bufnr, winnr, row, col)
-  local first_line = M.get_line(bufnr, row)
-
-  local trimmed = first_line:gsub('%s+$', '')
-  vim.api.nvim_buf_set_lines(bufnr,
-                             row,
-                             row + 1,
-                             true,
-                             { trimmed })
-  if op == 'join' then
-    vim.cmd.norm(row..'GJ')
-    M.jump_to_node_end_at(op, node, bufnr, winnr, row, col + 1, 0, trimmed:len())
-  else
-    M.jump_to_node_end_at(op, node, bufnr, winnr, row + 1, col, 1, -1)
-  end
-end
-
-function M.jump_to_node_end_at(op, orig_node, bufnr, winnr, row, col, row_offset, col_offset)
-  local found, new_node = pcall(get_node_at_pos, bufnr,
-                                             row,
-                                             col,
-                                             { ignore_injections = false })
-  if found and new_node then
-    local _, _, end_row, end_col = new_node:range()
-
-    vim.api.nvim_win_set_cursor(winnr, {
-      end_row + (row_offset or 1),
-      end_col + (col_offset or -1),
-    })
-  end
-end
-
 function M.get_joined(lang, type, sep, joined)
   if M.node_is_sep_first(lang, type) then
     return joined:gsub('%s*%'..sep, sep)
@@ -86,10 +54,15 @@ function M.add_sep(lang, type, base, indent, sep)
       return (base..indent..vim.trim(x)..sep)
     end
   end
-
 end
 
-function M.get_line(bufnr, row)
+
+
+
+
+
+-- BUFFER ROW HELPERS
+function M.buffer_get_line(bufnr, row)
   local line = unpack(vim.api.nvim_buf_get_lines(bufnr,
                                                  row,
                                                  row + 1,
@@ -97,13 +70,31 @@ function M.get_line(bufnr, row)
   return line
 end
 
+function M.buffer_join_row_below(row)
+  local fst = M.buffer_get_line(0, row)
+  local snd = M.buffer_get_line(0, row + 1)
+  vim.api.nvim_buf_set_lines(0,
+                             row,
+                             row + 2,
+                             true,
+                             { fst:gsub('%s*$',' ') .. snd:gsub('^%s*', '') })
+end
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 -- NODE HELPERS
-function M.cursor_to_node_end(original_node)
+function M.node_cursor_to_end(original_node)
   local row, col = original_node:range()
   local found, node = pcall(vim.treesitter.get_node_at_pos, 0, row, col, { ignore_injections = false })
   if found and node then
@@ -112,10 +103,10 @@ function M.cursor_to_node_end(original_node)
   end
 end
 
-function M.is_child_of(type, node)
-  local current = node
+function M.node_is_child_of(type, node)
+  local current = node:parent()
   repeat
-    if current:type() == type then
+    if current and current:type() == type then
       return true
     end
     current = current:parent()
@@ -123,12 +114,11 @@ function M.is_child_of(type, node)
   return false
 end
 
-function M.replace_node(node, replacement)
+function M.node_replace(node, replacement)
   local row, col, row_end, col_end = node:range()
-  local base_indent = M.get_base_indent(node) or ''
+  local base_indent = M.node_get_base_indent(node) or ''
   local starts_newline = replacement:match'^\n'
   local lines = M.split(replacement, '\n')
-        print(vim.inspect(lines))
   for i, line in ipairs(lines) do
     if i > 1 then
       lines[i] = base_indent..line
@@ -143,14 +133,14 @@ function M.replace_node(node, replacement)
                             lines)
 end
 
-function M.get_base_indent(node)
+function M.node_get_base_indent(node)
   local row = node:range()
-  return M.get_line(0, row):match'^%s+' or ''
+  return M.buffer_get_line(0, row):match'^%s+' or ''
 end
 
-function M.trim_node_line_end(node)
+function M.node_trim_line_end(node)
   local row = node:range()
-  local trimmed = M.get_line(0, row):gsub('%s*$', '')
+  local trimmed = M.buffer_get_line(0, row):gsub('%s*$', '')
   vim.api.nvim_buf_set_lines(0,
                              row,
                              row + 1,
@@ -158,15 +148,9 @@ function M.trim_node_line_end(node)
                              { trimmed })
 end
 
-function M.join_with_previous_line(node)
+function M.node_join_to_previous_line(node)
   local row = node:range()
-  local previous = M.get_line(0, row - 1)
-  local current = M.get_line(0, row)
-  vim.api.nvim_buf_set_lines(0,
-                             row - 1,
-                             row,
-                             true,
-                             { previous .. ' ' .. current })
+  M.buffer_join_row_below(row - 1)
 end
 
 
@@ -222,9 +206,6 @@ M.node_is_padded = get_option_for('pad')
 M.node_is_no_trailing_comma = get_config_for('no_trailing_comma')
 
 M.get_config_handlers = get_config_for('handlers')
-M.get_config_after = get_config_for('after', M.jump_to_node_end_at)
-M.get_config_before = get_config_for('before', function(_, _, _, lines) return lines end)
-M.get_config_operative_node = get_config_for('operative_node')
 M.get_config_separators = get_config_for('separators')
 M.get_config_indent = get_config_for('default_indent')
 

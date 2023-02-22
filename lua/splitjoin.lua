@@ -45,10 +45,6 @@ local function get_node(bufnr, winnr)
 
   local node = nodes[#nodes]
   if node then
-    local getter = U.get_config_operative_node(lang, node:type())
-    if getter then
-      node = getter(node) or node
-    end
     local start_row, start_col, end_row, end_col = node:range()
     local range = { start_row, start_col, end_row, end_col }
     local source = vim.treesitter.get_node_text(node, bufnr)
@@ -92,13 +88,11 @@ local function splitjoin(op)
       local type = node:type()
       local handler = U.get_config_handlers(lang, type, op)
       if handler then return handler(node) end
-      local after = U.get_config_after(lang, type)
-      local before = U.get_config_before(lang, type)
       local indent = U.get_config_indent(lang, type) or '  '
       local sep = U.get_config_separators(lang, type) or ','
       local open, close = U.get_config_surrounds(lang, type, source)
       local row, col, end_row, end_col = unpack(range)
-      local base_indent = U.get_base_indent(node)
+      local base_indent = U.node_get_base_indent(node)
 
       local lines = flatten(operation(source,
                                       lang,
@@ -109,24 +103,19 @@ local function splitjoin(op)
                                       indent,
                                       base_indent))
 
-      local final = before(op,
-                           node,
-                           base_indent,
-                           lines) or lines
-
       vim.api.nvim_buf_set_text(bufnr,
                                 row,
                                 col,
                                 end_row,
                                 end_col,
-                                final)
+                                lines)
 
-      after(op, node, bufnr, winnr, row, col)
+      U.node_cursor_to_end(node)
 
       if op == 'split' and base_indent:len() > 0 and close then
-        local last_row = row + #final - 1
+        local last_row = row + #lines - 1
         vim.api.nvim_buf_set_lines(bufnr, last_row, last_row + 1, false, {
-          base_indent .. U.get_line(bufnr, last_row)
+          base_indent .. U.buffer_get_line(bufnr, last_row)
         })
       end
     end
