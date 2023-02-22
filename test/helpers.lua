@@ -28,7 +28,7 @@ function M.get_buf_text(bufnr)
   return table.concat(vim.api.nvim_buf_get_text(bufnr, 0, 0, -1, -1, {}), '\n')
 end
 
-function M.make_suite(lang, name, fixture, split_expected, go_to)
+function M.make_suite(lang, name, input, expected, go_to)
   local assert = require 'luassert'
   local splitjoin = require'splitjoin'
   describe(name, function()
@@ -41,7 +41,7 @@ function M.make_suite(lang, name, fixture, split_expected, go_to)
           bufnr = vim.api.nvim_create_buf(true, false)
           vim.api.nvim_win_set_buf(0, bufnr)
           vim.opt.filetype = lang
-          local lines = vim.split(fixture, '\n', { plain = true, trimempty = false })
+          local lines = vim.split(input, '\n', { plain = true, trimempty = false })
           vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, lines)
           if type(go_to) == 'string' then
             vim.cmd.norm('f'..go_to)
@@ -61,13 +61,13 @@ function M.make_suite(lang, name, fixture, split_expected, go_to)
 
       it('as expected', function()
         splitjoin.split()
-        assert.same(split_expected, M.get_buf_text(bufnr))
+        assert.same(expected, M.get_buf_text(bufnr))
       end)
       describe('and rejoins', function()
         it('as expected', function()
           splitjoin.split()
           splitjoin.join()
-          assert.same(fixture, M.get_buf_text(bufnr))
+          assert.same(input, M.get_buf_text(bufnr))
         end)
       end)
     end)

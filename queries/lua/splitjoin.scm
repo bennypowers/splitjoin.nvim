@@ -3,4 +3,5 @@
   (parameters)
   (arguments)
   (variable_list)
+  (if_statement)
 ] @_splitjoin

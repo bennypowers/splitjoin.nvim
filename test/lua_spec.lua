@@ -1,6 +1,6 @@
-local d = require'plenary.strings'.dedent
-
 local H = require'test.helpers'
+
+local d = require'plenary.strings'.dedent
 
 local lang = 'lua'
 
@@ -119,6 +119,80 @@ describe(lang, function()
         a,
         b,
         c = mod(a, b, c)
+      end
+    ]],
+    { 2, 4 }
+  )
+
+  H.make_suite(lang, 'if',
+    d[[
+      if this then that() end
+    ]],
+    d[[
+      if this then
+        that()
+      end
+    ]],
+    'i'
+  )
+
+  H.make_suite(lang, 'if this and that',
+    d[[
+      if this and that then theother() end
+    ]],
+    d[[
+      if this and that then
+        theother()
+      end
+    ]],
+    'i'
+  )
+
+  H.make_suite(lang, 'if else',
+    d[[
+      if this then theother() else thefirst() end
+    ]],
+    d[[
+      if this then
+        theother()
+      else
+        thefirst()
+      end
+    ]],
+    'i'
+  )
+
+  H.make_suite(lang, 'if elseif else',
+    d[[
+      if this then that() elseif theother then thefirst() else otherwise() end
+    ]],
+    d[[
+      if this then
+        that()
+      elseif theother then
+        thefirst()
+      else
+        otherwise()
+      end
+    ]],
+    'i'
+  )
+
+  H.make_suite(lang, 'indented if elseif else',
+    d[[
+      function hi()
+        if this then that() elseif theother then thefirst() else otherwise() end
+      end
+    ]],
+    d[[
+      function hi()
+        if this then
+          that()
+        elseif theother then
+          thefirst()
+        else
+          otherwise()
+        end
       end
     ]],
     { 2, 4 }

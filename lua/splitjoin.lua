@@ -90,13 +90,15 @@ local function splitjoin(op)
     if node then
       if op == 'join' and not source:find'\n' then return end
       local type = node:type()
+      local handler = U.get_config_handlers(lang, type, op)
+      if handler then return handler(node) end
       local after = U.get_config_after(lang, type)
       local before = U.get_config_before(lang, type)
       local indent = U.get_config_indent(lang, type) or '  '
       local sep = U.get_config_separators(lang, type) or ','
       local open, close = U.get_config_surrounds(lang, type, source)
       local row, col, end_row, end_col = unpack(range)
-      local base_indent = U.get_line(bufnr, row):match'^%s+' or ''
+      local base_indent = U.get_base_indent(node)
 
       local lines = flatten(operation(source,
                                       lang,

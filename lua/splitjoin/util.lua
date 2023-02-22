@@ -1,12 +1,19 @@
+local map = vim.tbl_map
+
 local M = {}
 
 local OPTIONS = {}
 local DEFAULTS = {}
 
 local function get_config_for(key, fallback)
-  return function(lang, type)
+  return function(lang, type, op)
     local mod = DEFAULTS.languages[lang]
-    return (mod and mod[key] and mod[key][type]) or fallback
+    -- TODO: make everything a node handler
+    if key == 'handlers' then
+      return (mod and mod[key] and mod[key][type] and mod[key][type][op]) or fallback
+    else
+      return (mod and mod[key] and mod[key][type]) or fallback
+    end
   end
 end
 
@@ -71,6 +78,11 @@ function M.get_line(bufnr, row)
   return line
 end
 
+function M.get_base_indent(node)
+  local row = node:range()
+  return M.get_line(0, row):match'^%s+' or ''
+end
+
 function M.get_joined(lang, type, sep, joined)
   if M.node_is_sep_first(lang, type) then
     return joined:gsub('%s*%'..sep, sep)
@@ -100,6 +112,15 @@ end
 
 local get_node_at_pos = vim.treesitter.get_node_at_pos
 
+function M.cursor_to_node_end(original_node)
+  local row, col = original_node:range()
+  local found, node = pcall(vim.treesitter.get_node_at_pos, 0, row, col, { ignore_injections = false })
+  if found and node then
+    local _, _, row_end, col_end = node:range()
+    vim.api.nvim_win_set_cursor(0, { row_end + 1, col_end - 1 })
+  end
+end
+
 function M.jump_to_node_end_at(op, orig_node, bufnr, winnr, row, col, row_offset, col_offset)
   local found, new_node = pcall(get_node_at_pos, bufnr,
                                              row,
@@ -125,10 +146,28 @@ function M.normalize_item(sep)
   end
 end
 
+function M.replace_node(node, replacement)
+  local row, col, row_end, col_end = node:range()
+  local base_indent = M.get_base_indent(node) or ''
+  local lines = M.split(replacement, '\n')
+  for i, line in ipairs(lines) do
+    if i > 1 then
+      lines[i] = base_indent..line
+    end
+  end
+  vim.api.nvim_buf_set_text(0,
+                            row,
+                            col,
+                            row_end,
+                            col_end,
+                            lines)
+end
+
 M.node_is_sep_first = get_option_for('sep_first')
 M.node_is_padded = get_option_for('pad')
 M.node_is_no_trailing_comma = get_config_for('no_trailing_comma')
 
+M.get_config_handlers = get_config_for('handlers')
 M.get_config_after = get_config_for('after', M.jump_to_node_end_at)
 M.get_config_before = get_config_for('before', function(_, _, _, lines) return lines end)
 M.get_config_operative_node = get_config_for('operative_node')
