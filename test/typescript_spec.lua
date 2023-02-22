@@ -73,4 +73,19 @@ describe(lang, function()
     ','
   )
 
+  H.make_suite(lang,
+    'named imports',
+    d[[
+      import { a, b, c } from 'd'
+    ]],
+    d[[
+      import {
+        a,
+        b,
+        c,
+      } from 'd'
+    ]],
+    ','
+  )
+
 end)
