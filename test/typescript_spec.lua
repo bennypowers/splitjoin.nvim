@@ -47,4 +47,30 @@ describe(lang, function()
     '|'
   )
 
+  H.make_suite(lang, 'type params',
+    d[[
+      class A<B, C> {}
+    ]],
+    d[[
+      class A<
+        B,
+        C,
+      > {}
+    ]],
+    ','
+  )
+
+  H.make_suite(lang, 'type arguments',
+    d[[
+      f<A, B>()
+    ]],
+    d[[
+      f<
+        A,
+        B
+      >()
+    ]],
+    ','
+  )
+
 end)
