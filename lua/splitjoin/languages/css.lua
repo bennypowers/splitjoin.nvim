@@ -12,11 +12,4 @@ return {
   separators = {
     block = ';',
   },
-  before = {
-    block = function(op, _, _, lines)
-      if op == 'join' then
-        -- lines[#lines] = lines[#lines] .. ';'
-      end
-    end
-  }
 }

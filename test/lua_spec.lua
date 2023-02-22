@@ -136,7 +136,7 @@ describe(lang, function()
               c = mod(a, b, c)
       end
     ]],
-    { 2, 4 }
+    { 2, 10 }
   )
 
   H.make_suite(lang, 'if',
