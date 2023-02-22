@@ -74,6 +74,21 @@ describe(lang, function()
   )
 
   H.make_suite(lang,
+    'named imports',
+    d[[
+      import { a, b, c } from 'd'
+    ]],
+    d[[
+      import {
+        a,
+        b,
+        c,
+      } from 'd'
+    ]],
+    ','
+  )
+
+  H.make_suite(lang,
     'base indent',
     d[[
       function thingy(a, b, c) {

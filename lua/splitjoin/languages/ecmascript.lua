@@ -4,6 +4,7 @@ return {
     default_indent = '  ',
     pad = {
       object = true,
+      named_imports = true,
     },
   },
   surround = {
@@ -11,5 +12,6 @@ return {
     array = { '[', ']' },
     arguments = { '(', ')' },
     formal_parameters = { '(', ')' },
+    named_imports = { '{', '}' },
   },
 }
