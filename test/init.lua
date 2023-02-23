@@ -9,14 +9,8 @@ function M.load(plugin)
   local package_root = H.root'.test/site/pack/deps/start/'
   if not vim.loop.fs_stat(package_root .. name) then
     print('Installing ' .. plugin)
-    vim.fn.mkdir(package_root, "p")
-    vim.fn.system({
-      "git",
-      "clone",
-      "--depth=1",
-      "https://github.com/" .. plugin .. ".git",
-      package_root .. "/" .. name,
-    })
+    vim.fn.mkdir(package_root, 'p')
+    vim.fn.system({ 'git', 'clone', '--depth=1', 'https://github.com/' .. plugin .. '.git', package_root .. '/' .. name, })
   end
 end
 
@@ -28,7 +22,7 @@ function M.setup()
   M.load'nvim-treesitter/nvim-treesitter'
 
   require'nvim-treesitter.configs'.setup {
-    ensure_installed = { "typescript", "lua", "css", "javascript" },
+    ensure_installed = { 'typescript', 'lua', 'css', 'javascript' },
     sync_install = true,
   }
 

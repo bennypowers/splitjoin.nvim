@@ -17,10 +17,6 @@ return { 'bennypowers/splitjoin.nvim',
     { 'gj', function() require'splitjoin'.join() end, desc = 'Join the object under cursor' },
     { 'g,', function() require'splitjoin'.split() end, desc = 'Split the object under cursor' },
   },
-  opts = {
-    default_indent = '  ', -- default
-    languages = {}, -- see Options
-  },
 }
 ```
 
@@ -31,69 +27,16 @@ fallback indent when a language does not have an indent configured. The
 `languages` table lets you specify or modify language rules. Each language table 
 contains an `options` key which can have the following members:
 
-| name                | type                  | description                                             |
-| ----                | ----                  | -----------                                             |
-| `default_indent`    | string                | indent to apply when splitting                          |
-| `pad`               | table<string, bool>   | pad these node types with a single space when joining   |
-
-Table values map node type names to bool or string. For example, these options 
-for CSS ensure that blocks are padded when joined, and indented by two spaces 
-when split.
-
-```lua
----@return SplitjoinLanguageConfig
-return {
-  options = {
-    default_indent = '  ',
-    pad = {
-      block = true,
-    },
-  }
-}
-```
-
-In addition, a language table can specify the following config, which will be 
-overridden by the defaults:
-
-| name                | type                  | description                                             |
-| ----                | ----                  | -----------                                             |
-| `no_trailing_comma` | table<string, bool>   | remove trailing commas when splitting these             |
-| `separators`        | table<string, string> | use this string as separator when operating             | operating  |
-
-This is really only useful when [adding your own language](#adding-a-language).
+| name                    | type                  | description                                         |
+| ----                    | ----                  | -----------                                         |
+| `default_indent`        | string                | indent to apply when splitting                      |
+| `nodes`                 | table<string, table>  | options for this node                               |
+| `nodes[name].padding`   | string                | padding to apply when joining                       |
+| `nodes[name].sep_first` | boolean               | whether to place the separator first when splitting |
 
 ### Default Options
 
-```lua
-local DEFAULT_OPTIONS = {
-  default_indent = '  ',
-  languages = {
-    lua = {
-      default_indent = '  ',
-      pad = {
-        table_constructor = true,
-      },
-    },
-    ecmascript = {
-      default_indent = '  ',
-      pad = {
-        object = true,
-      },
-    },
-    css = {
-      pad = {
-        block = true,
-      },
-    },
-    javascript = {
-      extends = 'ecmascript',
-    },
-    typescript = {
-      extends = 'ecmascript',
-    },
-  },
-}
-```
+See `languages/*/options.lua`
 
 ## `split()`
 
