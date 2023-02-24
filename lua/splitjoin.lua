@@ -1,9 +1,20 @@
 local Options = require'splitjoin.util.options'
 local DefaultHandlers = require'splitjoin.util.handlers'
 
+---@class SplitjoinLanguageOptions
+---@field default_indent string
+---@field surround string[] tuple of surround strings
+---@field separator string=','
+---@field padding string
+---@field trailing_separator boolean=true
+
+---@class SplitjoinOptions
+---@field default_indent string
+---@field languages table<string, SplitjoinLanguageOptions>
+
 local Splitjoin = {}
 
-local function get_operable_node_and_lang_under_cursor (bufnr, winnr)
+local function get_lang_and_operable_node_under_cursor (bufnr, winnr)
   local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
   -- TODO: cache a reference per bufnr
   local tsparser = vim.treesitter.get_parser(bufnr)
@@ -32,7 +43,7 @@ local function splitjoin(op)
   return function()
     local bufnr = 0
     local winnr = 0
-    local lang, node = get_operable_node_and_lang_under_cursor(bufnr, winnr)
+    local lang, node = get_lang_and_operable_node_under_cursor(bufnr, winnr)
     if node then
       local options = Options.get_options_for(lang, node:type())
       local handler = options[op] or DefaultHandlers[op]

@@ -38,8 +38,7 @@ function M.make_suite(lang, name, input, expected, go_to)
   local assert = require 'luassert'
   local splitjoin = require'splitjoin'
 
-  describe(name, function()
-
+  function test()
     describe('splits', function()
         local bufnr
 
@@ -78,7 +77,13 @@ function M.make_suite(lang, name, input, expected, go_to)
         end)
       end)
     end)
-  end)
+  end
+
+  if (#name) then
+    describe(name, test)
+  else
+    test()
+    end
 end
 
 return M

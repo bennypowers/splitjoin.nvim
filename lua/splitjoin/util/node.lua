@@ -1,6 +1,7 @@
 local Buffer = require'splitjoin.util.buffer'
 local String = require'splitjoin.util.string'
 
+local filter = vim.tbl_filter
 local get_node_text = vim.treesitter.get_node_text
 
 local Node = {}
@@ -79,6 +80,76 @@ end
 function Node.join_to_previous_line(node)
   local row = node:range()
   Buffer.join_row_below(row - 1)
+end
+
+--- default, child-aware splitter
+---@param node tsnode
+---@param options SplitjoinLanguageOptions
+function Node.split(node, options)
+  local indent = options.default_indent or '  '
+  local sep = options.separator or ','
+  local separator_is_node = options.separator_is_node or true
+  local open, close = unpack(options.surround or {})
+  local lines = {}
+
+  for child in node:iter_children() do
+    local type = child:type()
+    if     type == open then  table.insert(lines, open..'\n')
+    elseif type == sep then   table.insert(lines, (separator_is_node and '\n' or ''))
+    elseif type == close then table.insert(lines, close)
+    else
+      local text = vim.trim(Node.get_text(child)):gsub(sep..'$', '')
+      local line = indent .. text .. sep
+      table.insert(lines, line..(separator_is_node and '\n' or ''))
+    end
+  end
+
+  lines = filter(function(line) return String.is_lengthy(vim.trim(line)) end, lines)
+
+  if options.trailing_separator == false then
+    local index = #lines
+    if close and #close > 0 then index = index - 1 end
+    lines[index] = lines[index]:gsub(sep..'%s$', '\n')
+  end
+
+  Node.replace(node, table.concat(lines, ''))
+  Node.cursor_to_end(node)
+end
+
+function Node.join(node, options)
+  local replacement = ''
+  local sep = options.separator or ','
+  local open, close = unpack(options.surround or {})
+  local padding = options.padding or ''
+
+  local function append(string, suffix)
+    suffix = suffix or ''
+    replacement = replacement .. string .. suffix
+  end
+
+  for child in node:iter_children() do
+    local type = child:type()
+    if     type == open then  append(type, padding)
+    elseif type == close then append(padding, type)
+    elseif type == sep then
+      if Node.next_sibling_is(child, close) then
+        append('', '')
+      else
+        append(sep, ' ') -- TODO: inner vs outer padding
+      end
+    elseif options.separator_is_node == false then
+      local text = vim.trim(Node.get_text(child)):gsub(sep..'$', '')
+      if Node.next_sibling_is(child, close) then
+        append(text)
+      else
+        append(text..sep, ' ') -- TODO: inner vs outer padding
+      end
+    else
+      append(vim.trim(Node.get_text(child)))
+    end
+  end
+  Node.replace(node, replacement)
+  Node.cursor_to_end(node)
 end
 
 return Node
