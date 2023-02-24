@@ -6,18 +6,18 @@ local map = vim.tbl_map
 local DefaultHandlers = {}
 
 function DefaultHandlers.split(node, options)
-  local source = vim.treesitter.get_node_text(node, 0)
+  local source = Node.get_text(node)
   local open, close = unpack(options.surround or {})
   local indent = options.default_indent or '  '
   local sep = options.separator or ','
 
-  local inner = source
+  local unsurrounded = source
 
   if options.surround then
-    inner = source:sub(#open+1, -(#close+1))
+    unsurrounded = source:sub(#open+1, -(#close+1))
   end
 
-  local lines = String.split(inner, sep)
+  local lines = String.split(unsurrounded, sep)
 
   for i, line in ipairs(lines) do
     if options.sep_first then
@@ -47,7 +47,7 @@ function DefaultHandlers.split(node, options)
 end
 
 function DefaultHandlers.join(node, options)
-  local source = vim.treesitter.get_node_text(node, 0)
+  local source = Node.get_text(node)
   if not source:find'\n' then return end
 
   local open, close = unpack(options.surround or {})

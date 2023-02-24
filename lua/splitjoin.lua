@@ -12,6 +12,7 @@ local function get_operable_node_and_lang_under_cursor (bufnr, winnr)
   local lang = langtree:lang()
   local query = vim.treesitter.get_query(lang, 'splitjoin')
   local nodes = {}
+
   if query then
     for _, node, _ in query:iter_captures(tstree:root(), bufnr, row - 1, row) do
       if vim.treesitter.is_in_node_range(node, row - 1, col) then
@@ -21,8 +22,9 @@ local function get_operable_node_and_lang_under_cursor (bufnr, winnr)
   end
 
   local node = nodes[#nodes]
+
   if node then
-    return node, lang
+    return lang, node
   end
 end
 
@@ -30,7 +32,7 @@ local function splitjoin(op)
   return function()
     local bufnr = 0
     local winnr = 0
-    local node, lang = get_operable_node_and_lang_under_cursor(bufnr, winnr)
+    local lang, node = get_operable_node_and_lang_under_cursor(bufnr, winnr)
     if node then
       local options = Options.get_options_for(lang, node:type())
       local handler = options[op] or DefaultHandlers[op]

@@ -28,6 +28,12 @@ function M.get_buf_text(bufnr)
   return table.concat(vim.api.nvim_buf_get_text(bufnr, 0, 0, -1, -1, {}), '\n')
 end
 
+function M.get_char_at_cursor()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  local char = vim.api.nvim_get_current_line():sub(col+1,col+1)
+  return char
+end
+
 function M.make_suite(lang, name, input, expected, go_to)
   local assert = require 'luassert'
   local splitjoin = require'splitjoin'

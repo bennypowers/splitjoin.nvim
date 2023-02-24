@@ -1,9 +1,27 @@
 local Buffer = require'splitjoin.util.buffer'
 local String = require'splitjoin.util.string'
 
+local get_node_text = vim.treesitter.get_node_text
+
 local Node = {}
 
 -- NODE HELPERS
+
+---@param node tsnode
+---@return string
+function Node.get_text(node)
+  return get_node_text(node, 0)
+end
+
+
+---@param node tsnode
+---@param type string type name
+---@return boolean
+function Node.next_sibling_is(node, type)
+  local next = node:next_sibling() or false
+  return next and next:type() == type
+end
+
 function Node.cursor_to_end(original_node)
   local row, col = original_node:range()
   local found, node = pcall(vim.treesitter.get_node_at_pos, 0, row, col, { ignore_injections = false })
