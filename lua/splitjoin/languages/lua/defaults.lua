@@ -57,8 +57,8 @@ return {
       surround = { '(', ')' },
       separator = ',',
       trailing_separator = false,
-      split = luasplit,
-      join = luajoin,
+      split = Node.split,
+      join = Node.join,
     },
 
     if_statement = {
@@ -101,8 +101,8 @@ return {
     table_constructor = {
       surround = { '{', '}' },
       separator = ',',
-      split = luasplit,
-      join = luajoin,
+      split = Node.split,
+      join = Node.join,
     },
 
     variable_list = {
