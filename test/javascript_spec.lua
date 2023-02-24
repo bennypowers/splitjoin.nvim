@@ -7,71 +7,282 @@ local lang = 'javascript'
 describe(lang, function()
 
   H.make_suite(lang,
-    'object',
-    d[[
-      { one: 1, two: 2, three: 3 }
-    ]],
-    d[[
-      {
-        one: 1,
-        two: 2,
-        three: 3,
-      }
-    ]],
-    ','
-  )
-
-  H.make_suite(lang,
-    'array',
-    d[=[
-      [1, 2, 3]
-    ]=],
-    d[=[
-      [
-        1,
-        2,
-        3,
-      ]
-    ]=],
-    ','
-  )
-
-  H.make_suite(lang,
-    'arrow params',
-    d[[
-      (a, b, c) => 0
-    ]],
-    d[[
-      (
-        a,
-        b,
-        c,
-      ) => 0
-    ]],
-    ','
-  )
-
-  H.make_suite(lang,
-    'arguments',
-    d[[
-      call(a, b, c)
-    ]],
-    d[[
-      call(
-        a,
-        b,
-        c,
-      )
-    ]],
-    ','
-  )
-
-  H.make_suite(lang,
     'noop',
     'const noSplit = 1',
     'const noSplit = 1',
     '1'
   )
+
+  describe('object', function()
+    H.make_suite(lang,
+      '',
+      d[[
+        { one: 1, two: 2, three: 3 }
+      ]],
+      d[[
+        {
+          one: 1,
+          two: 2,
+          three: 3,
+        }
+      ]],
+      ','
+    )
+
+    H.make_suite(lang,
+      'inner',
+      d[[
+        { one: 1, two: 2, three: { four: 4, five: 5 } }
+      ]],
+      d[[
+        { one: 1, two: 2, three: {
+          four: 4,
+          five: 5,
+        } }
+      ]],
+      '4'
+    )
+
+    H.make_suite(lang,
+      'outer',
+      d[[
+      { one: 1, two: 2, three: { four: 4, five: 5 } }
+      ]],
+      d[[
+      {
+        one: 1,
+        two: 2,
+        three: { four: 4, five: 5 },
+      }
+      ]],
+      'o'
+    )
+
+  end)
+
+  describe('array', function()
+
+    H.make_suite(lang,
+      '',
+      d[=[
+        [1, 2, 3]
+      ]=],
+      d[=[
+        [
+          1,
+          2,
+          3,
+        ]
+      ]=],
+      ','
+    )
+
+    H.make_suite(lang,
+      'inner',
+      d[=[
+        [1, 2, [3, 4]]
+      ]=],
+      d[=[
+        [1, 2, [
+          3,
+          4,
+        ]]
+      ]=],
+      '3'
+    )
+
+    H.make_suite(lang,
+      'outer',
+      d[=[
+        [1, 2, [3, 4]]
+      ]=],
+      d[=[
+        [
+          1,
+          2,
+          [3, 4],
+        ]
+      ]=],
+      '1'
+    )
+
+  end)
+
+  describe('parameters', function()
+
+    H.make_suite(lang,
+      'function',
+      d[[
+        function(a, b, c) {}
+      ]],
+      d[[
+        function(
+          a,
+          b,
+          c,
+        ) {}
+      ]],
+      ','
+    )
+
+    H.make_suite(lang,
+      'arrow',
+      d[[
+        (a, b, c) => 0
+      ]],
+      d[[
+        (
+          a,
+          b,
+          c,
+        ) => 0
+      ]],
+      ','
+    )
+
+    describe('destructured', function()
+
+      H.make_suite(lang,
+        'function',
+        d[[
+          function({ a, b, c }, d) {}
+        ]],
+        d[[
+          function(
+            { a, b, c },
+            d,
+          ) {}
+        ]],
+        ','
+      )
+
+      H.make_suite(lang,
+        'arrow',
+        d[[
+          ({ a, b, c }, d) => 0
+        ]],
+        d[[
+          (
+            { a, b, c },
+            d,
+          ) => 0
+        ]],
+        ','
+      )
+
+    end)
+
+  end)
+
+  describe('arguments', function()
+
+    H.make_suite(lang,
+      '',
+      d[[
+        call(a, b, c)
+      ]],
+      d[[
+        call(
+          a,
+          b,
+          c,
+        )
+      ]],
+      ','
+    )
+
+    H.make_suite(lang,
+      'with obj and array',
+      d[[
+        call(a, { b, c }, [d, e])
+      ]],
+      d[[
+        call(
+          a,
+          { b, c },
+          [d, e],
+        )
+      ]],
+      ','
+    )
+
+    H.make_suite(lang,
+      'outer',
+      d[[
+        f(a, b, c, g(d, e))
+      ]],
+      d[[
+        f(
+          a,
+          b,
+          c,
+          g(d, e),
+        )
+      ]],
+      'a'
+    )
+
+    describe('indented', function()
+
+      H.make_suite(lang,
+        '',
+        d[[
+          function thingy(a, b, c) {
+            return new Knaidlach(a, b, c);
+          }
+        ]],
+        d[[
+          function thingy(a, b, c) {
+            return new Knaidlach(
+              a,
+              b,
+              c,
+            );
+          }
+        ]],
+        { 2, 24 }
+      )
+
+      H.make_suite(lang,
+        'inner',
+        d[[
+        function thingy(a, b, c) {
+          return new Knaidlach(a, b, c(d, e));
+        }
+        ]],
+        d[[
+        function thingy(a, b, c) {
+          return new Knaidlach(a, b, c(
+            d,
+            e,
+          ));
+        }
+        ]],
+        { 2, 32 }
+      )
+
+      H.make_suite(lang,
+        'outer',
+        d[[
+          function thingy(a, b, c) {
+            return new Knaidlach(a, b, c(d, e));
+          }
+        ]],
+        d[[
+          function thingy(a, b, c) {
+            return new Knaidlach(
+              a,
+              b,
+              c(d, e),
+            );
+          }
+        ]],
+        { 2, 24 }
+      )
+
+    end)
+
+  end)
 
   H.make_suite(lang,
     'named imports',
@@ -86,67 +297,6 @@ describe(lang, function()
       } from 'd'
     ]],
     ','
-  )
-
-  H.make_suite(lang,
-    'base indent',
-    d[[
-      function thingy(a, b, c) {
-        return new Knaidlach(a, b, c);
-      }
-    ]],
-    d[[
-      function thingy(a, b, c) {
-        return new Knaidlach(
-          a,
-          b,
-          c,
-        );
-      }
-    ]],
-    { 2, 24 }
-  )
-
-  H.make_suite(lang,
-    'inner object',
-    d[[
-      { one: 1, two: 2, three: { four: 4, five: 5 } }
-    ]],
-    d[[
-      { one: 1, two: 2, three: {
-        four: 4,
-        five: 5,
-      } }
-    ]],
-    '4'
-  )
-
-  H.make_suite(lang,
-    'inner array',
-    d[=[
-      [1, 2, [3, 4]]
-    ]=],
-    d[=[
-      [1, 2, [
-        3,
-        4,
-      ]]
-    ]=],
-    '3'
-  )
-
-  H.make_suite(lang,
-    'inner arguments',
-    d[[
-      f(a, b, c, g(d, e))
-    ]],
-    d[[
-      f(a, b, c, g(
-        d,
-        e,
-      ))
-    ]],
-    'd'
   )
 
 end)
