@@ -26,4 +26,6 @@ jobs:
           neovim: true
           version: ${{ matrix.nvim-versions }}
       - name: Run Tests
-        run: sh test/run.sh
+        run: |
+          nvim --version
+          nvim --headless -u test/init.lua -c "lua require'plenary.test_harness'.test_directory('test/', {minimal_init='test/init.lua',sequential=true})"
