@@ -1,3 +1,5 @@
+local Node = require'splitjoin.util.node'
+
 ---@return SplitjoinLanguageConfig
 return {
   nodes = {
@@ -5,6 +7,9 @@ return {
     block = {
       surround = { '{', '}' },
       separator = ';',
+      separator_is_node = false,
+      join = Node.join,
+      split = Node.split,
     },
 
   },
