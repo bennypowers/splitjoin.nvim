@@ -244,6 +244,43 @@ describe(lang, function()
 
     end)
 
+    describe('outer', function()
+
+      H.make_suite(lang, 'arguments',
+        d[[
+          f(a, b, c, g(d, e))
+        ]],
+        d[[
+          f(
+            a,
+            b,
+            c,
+            g(d, e)
+          )
+        ]],
+        'a'
+      )
+
+      H.make_suite(lang, 'indented arguments',
+        d[[
+          if thing then
+            f(a, b, c, g(d, e))
+          end
+        ]],
+        d[[
+          if thing then
+            f(
+              a,
+              b,
+              c,
+              g(d, e)
+            )
+          end
+        ]],
+        { 2, 5 }
+      )
+
+    end)
   end)
 
   describe('variable lists', function()
