@@ -369,6 +369,18 @@ describe(lang, function()
       'i'
     )
 
+    H.make_suite(lang, '(and)',
+      d[[
+      if (this and that) then theother() end
+      ]],
+      d[[
+      if (this and that) then
+        theother()
+      end
+      ]],
+      'i'
+    )
+
     H.make_suite(lang, 'else',
       d[[
       if this then theother() else thefirst() end
@@ -399,26 +411,45 @@ describe(lang, function()
       'i'
     )
 
-    H.make_suite(lang, 'indented elseif',
+    H.make_suite(lang, 'nested elseif',
       d[[
-      function hi()
-        if this then that() elseif theother then thefirst() else otherwise() end
-      end
+      if this then that() elseif theother then thefirst() else otherwise() if did then cool else fail() end end
       ]],
       d[[
-      function hi()
-        if this then
-          that()
-        elseif theother then
-          thefirst()
-        else
-          otherwise()
-        end
+      if this then
+        that()
+      elseif theother then
+        thefirst()
+      else
+        otherwise() if did then cool else fail() end
       end
       ]],
-      { 2, 2 }
+      'i'
     )
 
+    describe('indented', function()
+
+      H.make_suite(lang, 'elseif',
+        d[[
+        function hi()
+          if this then that() elseif theother then thefirst() else otherwise() end
+        end
+        ]],
+        d[[
+        function hi()
+          if this then
+            that()
+          elseif theother then
+            thefirst()
+          else
+            otherwise()
+          end
+        end
+        ]],
+        { 2, 2 }
+      )
+
+    end)
   end)
 
 end)

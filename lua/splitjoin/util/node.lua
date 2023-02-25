@@ -104,7 +104,7 @@ function Node.split(node, options)
     end
   end
 
-  lines = filter(function(line) return String.is_lengthy(vim.trim(line)) end, lines)
+  lines = String.filter_only_whitespace(lines)
 
   if options.trailing_separator == false then
     local index = #lines
