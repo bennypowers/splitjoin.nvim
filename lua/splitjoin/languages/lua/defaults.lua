@@ -1,53 +1,5 @@
 local Node = require'splitjoin.util.node'
 
-local function luasplit (node, options)
-  local indent = options.default_indent or '  '
-  local sep = options.separator or ','
-  local open, close = unpack(options.surround or {})
-  local lines = {}
-  for child in node:iter_children() do
-    local type = child:type()
-    if     type == open then     table.insert(lines, open..'\n')
-    elseif type == sep then     table.insert(lines, '\n')
-    elseif type == close then     table.insert(lines, '\n'..close)
-    else
-      local line = indent .. vim.trim(Node.get_text(child)) .. sep
-      table.insert(lines, line)
-    end
-  end
-  if options.trailing_separator == false then
-    local index = #lines
-    if close and #close > 0 then index = index - 1 end
-    lines[index] = lines[index]:gsub(sep..'$', '')
-  end
-  Node.replace(node, table.concat(lines, ''))
-  Node.cursor_to_end(node)
-end
-
-local function luajoin(node, options)
-  local replacement = ''
-  local sep = options.separator or ','
-  local open, close = unpack(options.surround or {})
-  local function c(s, t) replacement = replacement .. s .. (t or '') end
-  local padding = options.padding or ''
-  for child in node:iter_children() do
-    local type = child:type()
-    if     type == open then  c(type, padding)
-    elseif type == close then c(padding, type)
-    elseif type == sep then
-      if Node.next_sibling_is(child, close) then
-        c('', '')
-      else
-        c(sep, ' ') -- TODO: inner vs outer padding
-      end
-    else
-      c(vim.trim(Node.get_text(child)))
-    end
-  end
-  Node.replace(node, replacement)
-  Node.cursor_to_end(node)
-end
-
 ---@type SplitjoinLanguageConfig
 return {
 
@@ -63,33 +15,61 @@ return {
 
     if_statement = {
       trailing_separator = false,
+      surround = { 'if', 'end' },
       split = function(node, options)
-        local indent = options.indent or '  '
-        Node.replace(node, vim.treesitter.get_node_text(node, 0)
-                               :gsub('%s+then%s+',   ' then\n'..indent)
-                               :gsub('%s+else%s+',   '\nelse\n'..indent)
-                               :gsub('%s*end%s*',    '\nend')
-                               :gsub(
-                                 '%s+elseif%s+(.*)then%s+',
-                                 function(s)
-                                   return '\n'
-                                    .. 'elseif '
-                                    .. vim.trim(s)
-                                    .. ' then'
-                                    .. '\n'
-                                    ..indent
-                                 end
-                               ))
+        local indent = options.default_indent or '  '
+        local lines = {}
+        for child in node:iter_children() do
+          local type = child:type()
+          if type == 'if' then
+            table.insert(lines, 'if '..Node.get_text(child:next_sibling())..' then\n')
+          elseif type == 'end' then
+            table.insert(lines, '\nend')
+          elseif type == 'block' then
+            table.insert(lines, indent .. vim.trim(Node.get_text(child)))
+          elseif type == 'elseif_statement' or type == 'else_statement' then
+            for grandchild in child:iter_children() do
+              local gctype = grandchild:type()
+              if gctype == 'elseif' then
+                table.insert(lines, '\nelseif '..Node.get_text(grandchild:next_sibling())..' then\n')
+              elseif gctype == 'else' then
+                table.insert(lines, '\nelse\n')
+              elseif gctype == 'block' then
+                local line = indent .. vim.trim(Node.get_text(grandchild))
+                table.insert(lines, line)
+              end
+            end
+          end
+        end
+        Node.replace(node, table.concat(lines, ''))
         Node.cursor_to_end(node)
       end,
       join = function(node)
-        local source = Node.get_text(node)
-        Node.replace(node, source
-                               :gsub('if%s+', 'if ')
-                               :gsub('%s*then%s+', ' then ')
-                               :gsub('%s*elseif%s+', ' elseif ')
-                               :gsub('%s*else%s+', ' else ')
-                               :gsub('%s*end%s*', ' end'))
+        local replacement = ''
+        local function append(s, t) replacement = replacement .. s .. (t or '') end
+        for child in node:iter_children() do
+          local type = child:type()
+          if type == 'if' then
+            append('if '..Node.get_text(child:next_sibling())..' then ')
+          elseif type == 'block' then
+            append(Node.get_text(child), ' ')
+          elseif type == 'elseif_statement' or type == 'else_statement' then
+            for grandchild in child:iter_children() do
+              local gctype = grandchild:type()
+              if gctype == 'elseif' then
+                append('elseif '..Node.get_text(grandchild:next_sibling())..' then', ' ')
+              elseif gctype == 'else' then
+                append('else', ' ')
+              elseif gctype == 'block' then
+                append(vim.trim(Node.get_text(grandchild)), ' ')
+              end
+            end
+          elseif type == 'end' then
+            append('end')
+          end
+        end
+        Node.replace(node, replacement)
+        Node.cursor_to_end(node)
       end
     },
 
