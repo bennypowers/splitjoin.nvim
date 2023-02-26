@@ -43,7 +43,7 @@ function DefaultHandlers.split(node, options)
   local replacement = table.concat(lines, '\n')
 
   Node.replace(node, replacement)
-  Node.cursor_to_end(node)
+  Node.goto_node(node)
 end
 
 function DefaultHandlers.join(node, options)
@@ -77,7 +77,7 @@ function DefaultHandlers.join(node, options)
   local replacement = (open or '') .. padding .. vim.trim(list) .. padding .. (close or '')
 
   Node.replace(node, replacement)
-  Node.cursor_to_end(node)
+  Node.goto_node(node)
 end
 
 return DefaultHandlers

@@ -22,7 +22,13 @@ function M.setup()
   M.load'nvim-treesitter/nvim-treesitter'
 
   require'nvim-treesitter.configs'.setup {
-    ensure_installed = { 'typescript', 'lua', 'css', 'javascript' },
+    ensure_installed = {
+      'lua',
+      'css',
+      'javascript',
+      'typescript',
+      'html',
+    },
     sync_install = true,
   }
 

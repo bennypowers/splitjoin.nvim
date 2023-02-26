@@ -20,7 +20,7 @@ return {
         local replacement = prefix..source:gsub('|', sep)
         Node.replace(n, replacement)
         Node.trim_line_end(node)
-        Node.cursor_to_end(node)
+        Node.goto_node(node)
         vim.cmd.norm'h'
       end,
       join = function(node, options)

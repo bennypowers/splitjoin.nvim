@@ -16,4 +16,15 @@ function String.filter_only_whitespace(lines)
   return filter(function(line) return String.is_lengthy(vim.trim(line)) end, lines)
 end
 
+function String.append(target)
+  local replacement = target
+  local function get() return replacement end
+  local function append(...)
+    for _, str in ipairs{ ... } do
+      replacement = replacement .. str
+    end
+  end
+  return append, get
+end
+
 return String
