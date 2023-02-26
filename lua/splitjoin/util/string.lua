@@ -18,7 +18,11 @@ end
 
 function String.append(target)
   local replacement = target
-  local function get() return replacement end
+  local function get()
+    local r = replacement
+    replacement = nil
+    return r
+  end
   local function append(...)
     for _, str in ipairs{ ... } do
       replacement = replacement .. str
