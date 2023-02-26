@@ -1,6 +1,6 @@
 local Node = require'splitjoin.util.node'
 
----@type SplitjoinLanguageConfig
+---@type SplitjoinLanguageOptions
 return {
 
   nodes = {
@@ -42,7 +42,7 @@ return {
           end
         end
         Node.replace(node, table.concat(lines, ''))
-        Node.cursor_to_end(node)
+        Node.goto_node(node)
       end,
       join = function(node)
         local replacement = ''
@@ -69,7 +69,7 @@ return {
           end
         end
         Node.replace(node, replacement)
-        Node.cursor_to_end(node)
+        Node.goto_node(node)
       end
     },
 
@@ -93,14 +93,14 @@ return {
         local indent = is_variable_decl and '      ' or ''
         local new = source:gsub(',%s*',',\n'..indent)
         Node.replace(node, new)
-        Node.cursor_to_end(node)
+        Node.goto_node(node)
         if is_variable_decl then Node.trim_line_end(node) end
       end,
       join = function(node)
         local source = vim.treesitter.get_node_text(node, 0)
         local next = source:gsub('%s+', ' ')
         Node.replace(node, next)
-        Node.cursor_to_end(node)
+        Node.goto_node(node)
       end
     },
 

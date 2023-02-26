@@ -23,13 +23,49 @@ function Node.next_sibling_is(node, type)
   return next and next:type() == type
 end
 
-function Node.cursor_to_end(original_node)
-  local row, col = original_node:range()
-  local found, node = pcall(vim.treesitter.get_node_at_pos, 0, row, col, { ignore_injections = false })
-  if found and node then
-    local _, _, row_end, col_end = node:range()
-    vim.api.nvim_win_set_cursor(0, { row_end + 1, col_end - 1 })
+local parsers = {}
+
+function Node.cache_parser(node, parser)
+  parsers[node] = parser
+end
+
+function Node.refresh(node)
+  local parser = parsers[node]
+  if parser then
+    parser:parse()
   end
+end
+
+function Node.goto_node(node, place, col_offset)
+  place = place or 'end'
+  col_offset = col_offset or 0
+  if node then
+    local srow, scol, erow, ecol = node:range()
+    local pos = { srow + 1, scol - 1 + col_offset }
+    if place == 'end' then
+      pos = { erow + 1, ecol - 1 + col_offset }
+    end
+    local success, err = pcall(vim.api.nvim_win_set_cursor, 0, pos)
+    if not success then
+      require'nvim-treesitter.ts_utils'.goto_node(node, place == 'end')
+    end
+  end
+end
+
+function Node.get_index(node)
+  local index = 0
+  local parent = node:parent()
+  for child in parent:iter_children() do
+    if child == node then
+      break
+    else
+      index = index + 1
+    end
+    if parent:child(index) ~= node then
+      index = -1
+    end
+  end
+  return index
 end
 
 function Node.is_child_of(type, node)
@@ -113,7 +149,7 @@ function Node.split(node, options)
   end
 
   Node.replace(node, table.concat(lines, ''))
-  Node.cursor_to_end(node)
+  Node.goto_node(node)
 end
 
 function Node.join(node, options)
@@ -149,7 +185,7 @@ function Node.join(node, options)
     end
   end
   Node.replace(node, replacement)
-  Node.cursor_to_end(node)
+  Node.goto_node(node)
 end
 
 return Node
