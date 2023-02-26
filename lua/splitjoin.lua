@@ -39,6 +39,7 @@ local function get_operable_node_under_cursor(bufnr, winnr)
     local node, name = unpack(result)
     local options = Options.get_options_for(lang, node:type()) or {}
           options.capture = name
+          options.lang = lang
     Node.cache_parser(node, tsparser)
     return node, options
   end

@@ -178,6 +178,37 @@ describe(lang, function()
 
   describe('functions', function()
 
+    describe('declarations', function()
+
+      H.make_suite(lang, '',
+        d[[
+          local function call() return end
+        ]],
+        d[[
+          local function call()
+            return
+          end
+        ]],
+        'f'
+      )
+
+    end)
+
+    describe('definitions', function()
+
+      H.make_suite(lang, '',
+        d[[
+          local call = function() return end
+        ]],
+        d[[
+          local call = function()
+            return
+          end
+        ]],
+        'f'
+      )
+
+    end)
     H.make_suite(lang, 'params',
       d[[
         local function call(

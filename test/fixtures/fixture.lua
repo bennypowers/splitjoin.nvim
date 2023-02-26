@@ -32,3 +32,5 @@ if this then that() elseif theother then thefirst() else otherwise() end
 local function thefirst()
   if this then that() elseif theother then thefirst() else otherwise() end
 end
+
+local f = function() end
