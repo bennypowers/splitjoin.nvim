@@ -13,3 +13,7 @@ function thingy() {
 }
 
 f(a, b, g(c, d))
+
+function f() { return 0; }
+
+() => 0

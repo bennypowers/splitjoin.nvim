@@ -6,11 +6,24 @@ local lang = 'javascript'
 
 describe(lang, function()
 
-  H.make_suite(lang,
-    'noop',
+  H.make_suite(lang, 'noop',
     'const noSplit = 1',
     'const noSplit = 1',
     '1'
+  )
+
+  H.make_suite(lang, 'named imports',
+    d[[
+      import { a, b, c } from 'd'
+    ]],
+    d[[
+      import {
+        a,
+        b,
+        c,
+      } from 'd'
+    ]],
+    ','
   )
 
   describe('object', function()
@@ -284,19 +297,31 @@ describe(lang, function()
 
   end)
 
-  H.make_suite(lang,
-    'named imports',
-    d[[
-      import { a, b, c } from 'd'
-    ]],
-    d[[
-      import {
-        a,
-        b,
-        c,
-      } from 'd'
-    ]],
-    ','
-  )
+  describe('function()', function()
+    H.make_suite(lang, '',
+      d[[
+        function f() { return 0; }
+      ]],
+      d[[
+        function f() {
+          return 0;
+        }
+      ]],
+      'f'
+    )
+  end)
 
+  describe('() => {}', function()
+    H.make_suite(lang, '',
+      d[[
+        () => 0
+      ]],
+      d[[
+        () => {
+          return 0;
+        }
+      ]],
+      '='
+    )
+  end)
 end)
