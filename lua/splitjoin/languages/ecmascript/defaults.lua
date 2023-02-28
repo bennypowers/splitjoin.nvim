@@ -1,4 +1,5 @@
 local Node = require'splitjoin.util.node'
+local ECMAScript = require'splitjoin.languages.ecmascript.functions'
 
 ---@type SplitjoinLanguageConfig
 return {
@@ -17,6 +18,10 @@ return {
       join = Node.join,
     },
 
+    named_imports = {
+      surround = { '{', '}' },
+    },
+
     arguments = {
       surround = { '(', ')' },
       split = Node.split,
@@ -29,8 +34,19 @@ return {
       join = Node.join,
     },
 
-    named_imports = {
-      surround = { '{', '}' },
+    function_declaration = {
+      split = ECMAScript.split_function,
+      join = ECMAScript.join_function,
+    },
+
+    ['function'] = {
+      split = ECMAScript.split_function,
+      join = ECMAScript.join_function,
+    },
+
+    arrow_function = {
+      split = ECMAScript.split_arrow_function,
+      join = ECMAScript.join_arrow_function,
     },
 
   },

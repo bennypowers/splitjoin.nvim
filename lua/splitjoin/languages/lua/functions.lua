@@ -1,7 +1,7 @@
 local Node = require'splitjoin.util.node'
 local String = require'splitjoin.util.string'
-
 local get_text = Node.get_text
+
 local Lua = {}
 
 function Lua.split_function(node, options)

@@ -16,4 +16,6 @@ f(a, b, g(c, d))
 
 function f() { return 0; }
 
-() => 0
+const f = function() { return 0; }
+
+const g = () => 0
