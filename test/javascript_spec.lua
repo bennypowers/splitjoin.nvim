@@ -311,7 +311,21 @@ describe(lang, function()
     )
   end)
 
-  describe('() => {}', function()
+  describe('const f = function() { return 0; }', function()
+    H.make_suite(lang, '',
+      d[[
+      const f = function() { return 0; }
+      ]],
+      d[[
+      const f = function() {
+        return 0;
+      }
+      ]],
+      'u'
+    )
+  end)
+
+  describe('() => 0', function()
     H.make_suite(lang, '',
       d[[
         () => 0
@@ -319,6 +333,35 @@ describe(lang, function()
       d[[
         () => {
           return 0;
+        }
+      ]],
+      '='
+    )
+  end)
+
+  describe('a => 0', function()
+    H.make_suite(lang, '',
+      d[[
+        a => 0
+      ]],
+      d[[
+        a => {
+          return 0;
+        }
+      ]],
+      '='
+    )
+  end)
+
+  describe('() => { const a = 0; return a; }', function()
+    H.make_suite(lang, '',
+      d[[
+        () => { const a = 0; return a; }
+      ]],
+      d[[
+        () => {
+          const a = 0;
+          return a;
         }
       ]],
       '='
