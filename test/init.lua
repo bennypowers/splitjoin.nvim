@@ -25,6 +25,7 @@ function M.setup()
     ensure_installed = {
       'lua',
       'css',
+      'json',
       'javascript',
       'typescript',
       'html',
