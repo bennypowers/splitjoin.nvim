@@ -17,10 +17,13 @@ local Splitjoin = {}
 
 local function get_operable_node_under_cursor(bufnr, winnr)
   local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
+  local cursor_range = { row, col, row, col }
   -- TODO: cache a reference per bufnr
   local tsparser = vim.treesitter.get_parser(bufnr)
-  local tstree = tsparser:parse()[1]
-  local langtree = tsparser:language_for_range { row, col, row, col };
+        tsparser:parse()
+  local langtree = tsparser:language_for_range(cursor_range);
+  local tstree = langtree:tree_for_range(cursor_range, { ignore_injections = false })
+  if not tstree then return nil, nil end
   local lang = langtree:lang()
   local query = vim.treesitter.get_query(lang, 'splitjoin')
   local nodes = {}
@@ -28,7 +31,7 @@ local function get_operable_node_under_cursor(bufnr, winnr)
   if query then
     for id, node, _ in query:iter_captures(tstree:root(), bufnr, row - 1, row) do
       if vim.treesitter.is_in_node_range(node, row - 1, col) then
-        table.insert(nodes, {node, query.captures[id]})
+        table.insert(nodes, { node, query.captures[id] })
       end
     end
   end
