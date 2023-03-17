@@ -14,9 +14,10 @@ end
 
 local function split_attrs(node, options)
   local parent = node:parent()
-  local indent = options.default_indent or '  '
+  local base_indent = Node.get_base_indent(parent)
+  local indent = base_indent .. (options.default_indent or '  ')
   if options.aligned then
-    indent = vim.split(Node.get_text(parent), '%s', {})[1]:gsub('.', ' ') .. ' '
+    indent = base_indent .. vim.split(Node.get_text(parent), '%s', {})[1]:gsub('.', ' ') .. ' '
   end
   for child in parent:iter_children() do
     local child_type = child:type()

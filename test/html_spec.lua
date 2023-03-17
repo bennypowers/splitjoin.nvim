@@ -69,6 +69,38 @@ describe(lang, function()
         'd'
       )
 
+      H.make_suite(lang, 'deeply nested',
+        d[[
+        <html>
+          <body>
+            <main>
+              <article>
+                <section>
+                  <img id="a" src="p.png" hidden>
+                </section>
+              </article>
+            </main>
+          </body>
+        </html>
+        ]],
+        d[[
+        <html>
+          <body>
+            <main>
+              <article>
+                <section>
+                  <img id="a"
+                       src="p.png"
+                       hidden>
+                </section>
+              </article>
+            </main>
+          </body>
+        </html>
+        ]],
+        { 6, 16 }
+      )
+
       end)
 
     end)
