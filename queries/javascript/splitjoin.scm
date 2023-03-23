@@ -11,3 +11,7 @@
 (arrow_function) @splitjoin.javascript.function.arrow
 (arguments) @splitjoin.javascript.function.arguments
 (formal_parameters) @splitjoin.javascript.function.parameters
+
+; assignment patterns
+(array_pattern) @splitjoin.javascript.array
+(object_pattern) @splitjoin.javascript.object

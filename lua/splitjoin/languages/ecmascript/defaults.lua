@@ -12,7 +12,19 @@ return {
       join = Node.join,
     },
 
+    object_pattern = {
+      surround = { '{', '}' },
+      split = Node.split,
+      join = Node.join,
+    },
+
     array = {
+      surround = { '[', ']' },
+      split = Node.split,
+      join = Node.join,
+    },
+
+    array_pattern = {
       surround = { '[', ']' },
       split = Node.split,
       join = Node.join,
