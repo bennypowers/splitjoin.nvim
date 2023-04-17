@@ -161,10 +161,11 @@ describe(lang, function()
           function({ a, b, c }, d) {}
         ]],
         d[[
-          function(
-            { a, b, c },
-            d,
-          ) {}
+          function({
+            a,
+            b,
+            c,
+          }, d) {}
         ]],
         ','
       )
@@ -175,10 +176,11 @@ describe(lang, function()
           ({ a, b, c }, d) => 0
         ]],
         d[[
-          (
-            { a, b, c },
-            d,
-          ) => 0
+          ({
+            a,
+            b,
+            c,
+          }, d) => 0
         ]],
         ','
       )

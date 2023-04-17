@@ -19,3 +19,7 @@ function f() { return 0; }
 const f = function() { return 0; }
 
 const g = () => 0
+
+function destruct({ a, b, c }, d) { return { a, b, c, d }; }
+
+destruct = ({ a, b, c }, d) => 0;

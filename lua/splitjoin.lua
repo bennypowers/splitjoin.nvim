@@ -25,7 +25,7 @@ local function get_operable_node_under_cursor(bufnr, winnr)
   local tsparser = get_parser(bufnr)
         tsparser:parse()
   local langtree = tsparser:language_for_range(cursor_range);
-  local tstree = langtree:tree_for_range(cursor_range, { ignore_injections = false })
+  local tstree = langtree:tree_for_range(cursor_range, { ignore_injections = false }) or langtree:trees()[1]
   if not tstree then return nil, nil end
   local lang = langtree:lang()
   local query = get_query(lang, 'splitjoin')
