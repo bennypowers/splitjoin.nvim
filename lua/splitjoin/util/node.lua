@@ -1,21 +1,20 @@
 local Buffer = require'splitjoin.util.buffer'
 local String = require'splitjoin.util.string'
 
-local filter = vim.tbl_filter
 local get_node_text = vim.treesitter.get_node_text
 
 local Node = {}
 
 -- NODE HELPERS
 
----@param node tsnode
+---@param node TSNode
 ---@return string
 function Node.get_text(node)
   return get_node_text(node, 0)
 end
 
 
----@param node tsnode
+---@param node TSNode
 ---@param type string type name
 ---@return boolean
 function Node.next_sibling_is(node, type)
@@ -45,7 +44,7 @@ function Node.goto_node(node, place, col_offset)
     if place == 'end' then
       pos = { erow + 1, ecol - 1 + col_offset }
     end
-    local success, err = pcall(vim.api.nvim_win_set_cursor, 0, pos)
+    local success = pcall(vim.api.nvim_win_set_cursor, 0, pos)
     if not success then
       require'nvim-treesitter.ts_utils'.goto_node(node, place == 'end')
     end
@@ -119,7 +118,7 @@ function Node.join_to_previous_line(node)
 end
 
 --- default, child-aware splitter
----@param node tsnode
+---@param node TSNode
 ---@param options SplitjoinLanguageOptions
 function Node.split(node, options)
   local indent = options.default_indent or '  '
