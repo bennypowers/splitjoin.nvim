@@ -1,6 +1,6 @@
 ; collections
-(object) @splitjoin.javascript.object
 (array) @splitjoin.javascript.array
+(object) @splitjoin.javascript.object
 
 ; imports
 (named_imports) @splitjoin.javascript.imports

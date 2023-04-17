@@ -14,6 +14,7 @@ return {
 
     object_pattern = {
       surround = { '{', '}' },
+      padding = ' ',
       split = Node.split,
       join = Node.join,
     },

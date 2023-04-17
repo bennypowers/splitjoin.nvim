@@ -151,6 +151,9 @@ function Node.split(node, options)
   Node.goto_node(node)
 end
 
+--- default, child-aware joiner
+---@param node TSNode
+---@param options SplitjoinLanguageOptions
 function Node.join(node, options)
   local replacement = ''
   local sep = options.separator or ','
