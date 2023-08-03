@@ -1,5 +1,7 @@
 # 🪓🧷 splitjoin.nvim
 
+[![Number of users on dotfyle][dotfyle-badge]][dotfyle]
+
 Split or join list-like syntax constructs. like `g,` and `gj` from the venerable 
 old [vim-mode-plus][vmp].
 
@@ -82,4 +84,5 @@ After:
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim
 [treesj]: https://github.com/Wansmer/treesj
 [tna]: https://github.com/CKolkey/ts-node-action/
-
+[dotfyle]: https://dotfyle.com/plugins/bennypowers/splitjoin.nvim
+[dotfyle-badge]: https://dotfyle.com/plugins/bennypowers/splitjoin.nvim/shield
