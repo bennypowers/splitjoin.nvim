@@ -7,7 +7,7 @@
 
 ; functions
 (function_declaration) @splitjoin.javascript.function.declaration
-(function) @splitjoin.javascript.function.lambda
+(function_expression) @splitjoin.javascript.function.lambda
 (arrow_function) @splitjoin.javascript.function.arrow
 (arguments) @splitjoin.javascript.function.arguments
 (formal_parameters) @splitjoin.javascript.function.parameters
