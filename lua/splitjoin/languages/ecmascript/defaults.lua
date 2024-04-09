@@ -52,7 +52,7 @@ return {
       join = ECMAScript.join_function,
     },
 
-    ['function'] = {
+    function_expression = {
       split = ECMAScript.split_function,
       join = ECMAScript.join_function,
     },

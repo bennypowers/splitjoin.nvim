@@ -11,7 +11,7 @@ function ECMAScript.split_function(node, options)
     local type = child:type()
     if type == 'formal_parameters' then append(get_text(child))
     elseif type == 'statement_block' then append(' {\n',indent, get_text(child):gsub('^{%s*', ''):gsub('%s*}$', ''), '\n}')
-    elseif type == 'function' then
+    elseif vim.startswith(type, 'function') then
       append('function')
       if node:type() == 'function_declaration' then
         append(' ')
@@ -55,7 +55,7 @@ function ECMAScript.join_function(node, options)
   for child in node:iter_children() do
     local type = child:type()
     if type == 'formal_parameters' then append(get_text(child), ' ')
-    elseif type == 'function' then
+    elseif vim.startswith(type, 'function') then
       append('function')
       if node:type() == 'function_declaration' then append(' ') end
     elseif type == 'statement_block' then
