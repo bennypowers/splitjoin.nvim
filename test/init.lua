@@ -26,6 +26,7 @@ function M.setup()
       'lua',
       'css',
       'json',
+      'jsdoc',
       'javascript',
       'typescript',
       'html',

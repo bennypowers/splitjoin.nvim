@@ -15,3 +15,5 @@
 ; assignment patterns
 (array_pattern) @splitjoin.javascript.array
 (object_pattern) @splitjoin.javascript.object
+
+(comment) @splitjoin.javascript.comment

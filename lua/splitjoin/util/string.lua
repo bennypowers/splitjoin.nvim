@@ -7,6 +7,14 @@ function String.is_lengthy(str)
   return #str > 0
 end
 
+function String.is_multiline(str)
+  return #vim.split(vim.fn.trim(str), '\n') > 1
+end
+
+function String.is_singleline(str)
+  return #vim.split(vim.fn.trim(str), '\n') == 1
+end
+
 function String.split(str, sep, opts)
   opts = vim.tbl_extend('keep', opts or {}, { plain = true, trimempty = true })
   return vim.split(str, sep, opts)

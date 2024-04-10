@@ -62,6 +62,11 @@ return {
       join = ECMAScript.join_arrow_function,
     },
 
+    -- comment = {
+    --   split = ECMAScript.split_comment,
+    --   join = ECMAScript.join_comment,
+    -- }
+
   },
 
 }

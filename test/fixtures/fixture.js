@@ -23,3 +23,15 @@ const g = () => 0
 function destruct({ a, b, c }, d) { return { a, b, c, d }; }
 
 destruct = ({ a, b, c }, d) => 0;
+
+  /** jsdoc */
+  const jsdoc = (thing) => thing
+
+/**
+ * multiline
+ * jsdoc
+ */
+const multilineJsdoc = (thing) => thing
+
+/** jsdoc @param {number} thing */
+const paramJsdoc = (thing) => thing

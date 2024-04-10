@@ -112,8 +112,9 @@ function Node.get_base_indent(node)
 end
 
 ---@param node TSNode
-function Node.trim_line_end(node)
-  local row = node:range()
+function Node.trim_line_end(node, rowoffset)
+  local noderow = node:range()
+  local row = noderow + (rowoffset or 0)
   local trimmed = Buffer.get_line(0, row):gsub('%s*$', '')
   vim.api.nvim_buf_set_lines(0,
                              row,
