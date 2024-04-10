@@ -13,3 +13,5 @@ import { a, b, c } from 'd'
 function() {
   type A = 1|2|3;
 }
+
+const f = function() { return 0; }
