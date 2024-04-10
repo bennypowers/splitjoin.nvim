@@ -50,7 +50,7 @@ function M.make_suite(lang, name, input, expected, go_to)
           local lines = vim.split(input, '\n', { plain = true, trimempty = false })
           vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, lines)
           if type(go_to) == 'string' then
-            vim.cmd.norm('f'..go_to)
+            vim.fn.search(go_to)
           elseif type(go_to) == 'table' then
             vim.api.nvim_win_set_cursor(0, go_to)
           end
