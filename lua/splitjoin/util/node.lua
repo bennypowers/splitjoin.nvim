@@ -24,10 +24,12 @@ end
 
 local parsers = {}
 
+---@param node TSNode
 function Node.cache_parser(node, parser)
   parsers[node] = parser
 end
 
+---@param node TSNode
 function Node.refresh(node)
   local parser = parsers[node]
   if parser then
@@ -35,6 +37,7 @@ function Node.refresh(node)
   end
 end
 
+---@param node TSNode
 function Node.goto_node(node, place, col_offset)
   place = place or 'end'
   col_offset = col_offset or 0
@@ -51,6 +54,7 @@ function Node.goto_node(node, place, col_offset)
   end
 end
 
+---@param node TSNode
 function Node.get_index(node)
   local index = 0
   local parent = node:parent()
@@ -67,6 +71,8 @@ function Node.get_index(node)
   return index
 end
 
+---@param type string
+---@param node TSNode
 function Node.is_child_of(type, node)
   local current = node:parent()
   repeat
@@ -78,6 +84,8 @@ function Node.is_child_of(type, node)
   return false
 end
 
+---@param node TSNode
+---@param replacement string
 function Node.replace(node, replacement)
   local row, col, row_end, col_end = node:range()
   local base_indent = Node.get_base_indent(node) or ''
@@ -97,11 +105,13 @@ function Node.replace(node, replacement)
                             lines)
 end
 
+---@param node TSNode
 function Node.get_base_indent(node)
   local row = node:range()
   return Buffer.get_line(0, row):match'^%s+' or ''
 end
 
+---@param node TSNode
 function Node.trim_line_end(node)
   local row = node:range()
   local trimmed = Buffer.get_line(0, row):gsub('%s*$', '')
@@ -112,6 +122,7 @@ function Node.trim_line_end(node)
                              { trimmed })
 end
 
+---@param node TSNode
 function Node.join_to_previous_line(node)
   local row = node:range()
   Buffer.join_row_below(row - 1)
