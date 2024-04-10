@@ -211,11 +211,7 @@ describe(lang, function()
     end)
     H.make_suite(lang, 'params',
       d[[
-        local function call(
-          a,
-          b,
-          c
-        ) end
+        local function call(a, b, c) end
       ]],
       d[[
         local function call(

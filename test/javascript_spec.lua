@@ -313,6 +313,52 @@ describe(lang, function()
     )
   end)
 
+  describe('jsdoc', function()
+    H.make_suite(lang, 'single line jsdoc',
+      d[[
+        /** jsdoc */
+        const x = y => y
+      ]],
+      d[[
+        /**
+         * jsdoc
+         */
+        const x = y => y
+      ]],
+      'jsdoc'
+    )
+    H.make_suite(lang, 'indented jsdoc',
+      d[[
+          /** indented jsdoc */
+          const x = y => y
+      ]],
+      d[[
+          /**
+           * indented jsdoc
+           */
+          const x = y => y
+      ]],
+      'jsdoc'
+    )
+    H.make_suite(lang, 'multiline jsdoc',
+      d[[
+        /**
+         * multiline
+         * jsdoc
+         */
+        const x = y => y
+      ]],
+      d[[
+        /**
+         * multiline
+         * jsdoc
+         */
+        const x = y => y
+      ]],
+      'jsdoc'
+    )
+  end)
+
   describe('const f = function() { return 0; }', function()
     H.make_suite(lang, '',
       d[[

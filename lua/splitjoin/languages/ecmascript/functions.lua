@@ -98,4 +98,32 @@ function ECMAScript.join_arrow_function(node, options)
   Node.goto_node(node)
 end
 
+-- function ECMAScript.split_comment(node, options)
+--   local text = Node.get_text(node)
+--   if String.is_multiline(text) or vim.startwith(text, '//') then return end
+--   local indent = options.default_indent or ' '
+--   local append, get = String.append('')
+--   append(
+--     '/**\n',
+--     indent,
+--     '* ',
+--     text.gsub([[(^/**)|(*/$)]], '')
+--     '\n */'
+--   )
+--   Node.replace(node, get())
+--   Node.trim_line_end(node)
+--   Node.trim_line_end(node, 1)
+--   Node.goto_node(node)
+-- end
+--
+-- function ECMAScript.join_comment(node, options)
+--   local text = Node.get_text(node)
+--   if String.is_multiline(text) or vim.startwith(text, '//') then return end
+--   local row, col = node:range()
+--   local comment = vim.treesitter.get_node{ pos = { row, col - 1 } }
+--   local description = text.gsub([[(^/**)|(*/$)]], '');
+--   Node.replace(comment, '/** ' .. description .. ' */')
+--   Node.goto_node(comment)
+-- end
+
 return ECMAScript

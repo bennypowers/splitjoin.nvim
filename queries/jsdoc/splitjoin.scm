@@ -1,0 +1,1 @@
+(description) @splitjoin.jsdoc.description

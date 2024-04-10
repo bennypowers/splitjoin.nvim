@@ -11,7 +11,7 @@ set -o errexit -o pipefail -o noclobber -o nounset
 
 # -allow a command to fail with !’s side effect on errexit
 # -use return value from ${PIPESTATUS[0]}, because ! hosed $?
-! getopt --test > /dev/null 
+! getopt --test > /dev/null
 if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
     echo 'I’m sorry, `getopt --test` failed in this environment.'
     exit 1

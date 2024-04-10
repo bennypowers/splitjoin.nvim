@@ -34,6 +34,11 @@ function M.get_char_at_cursor()
   return char
 end
 
+---@param lang string language name
+---@param name string suite name
+---@param input string code to operate on
+---@param expected string expected result
+---@param go_to string|number[] go_to result
 function M.make_suite(lang, name, input, expected, go_to)
   local assert = require 'luassert'
   local splitjoin = require'splitjoin'
@@ -43,18 +48,18 @@ function M.make_suite(lang, name, input, expected, go_to)
         local bufnr
 
         local function create ()
-        if not bufnr then
-          bufnr = vim.api.nvim_create_buf(true, false)
-          vim.api.nvim_win_set_buf(0, bufnr)
-          vim.opt.filetype = lang
-          local lines = vim.split(input, '\n', { plain = true, trimempty = false })
-          vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, lines)
-          if type(go_to) == 'string' then
-            vim.fn.search(go_to)
-          elseif type(go_to) == 'table' then
-            vim.api.nvim_win_set_cursor(0, go_to)
+          if not bufnr then
+            bufnr = vim.api.nvim_create_buf(true, false)
+            vim.api.nvim_win_set_buf(0, bufnr)
+            vim.opt.filetype = lang
+            local lines = vim.split(input, '\n', { plain = true, trimempty = false })
+            vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, lines)
+            if type(go_to) == 'string' then
+              vim.fn.search(go_to)
+            elseif type(go_to) == 'table' then
+              vim.api.nvim_win_set_cursor(0, go_to)
+            end
           end
-        end
         end
 
         local function destroy()

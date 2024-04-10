@@ -18,6 +18,7 @@ local function get_defaults()
       ecmascript = require'splitjoin.languages.ecmascript.defaults',
       javascript = require'splitjoin.languages.javascript.defaults',
       typescript = require'splitjoin.languages.typescript.defaults',
+      jsdoc = require'splitjoin.languages.jsdoc.defaults',
       json = require'splitjoin.languages.json.defaults',
       html = require'splitjoin.languages.html.defaults',
       css = require'splitjoin.languages.css.defaults',
