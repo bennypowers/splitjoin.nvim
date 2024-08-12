@@ -45,6 +45,20 @@ describe(lang, function()
       ';'
     )
 
+    H.make_suite(lang, 'arguments',
+      d[[
+        :is(h1, h2, h3) { color: blue }
+      ]],
+      d[[
+        :is(
+          h1,
+          h2,
+          h3
+        ) { color: blue }
+      ]],
+      '1'
+    )
+
   end)
 
 end)

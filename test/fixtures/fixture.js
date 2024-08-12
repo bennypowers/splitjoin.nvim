@@ -24,8 +24,11 @@ function destruct({ a, b, c }, d) { return { a, b, c, d }; }
 
 destruct = ({ a, b, c }, d) => 0;
 
-  /** jsdoc */
-  const jsdoc = (thing) => thing
+/** jsdoc */
+const jsdoc = (thing) => thing
+
+  /** indented jsdoc */
+  const ijsdoc = (thing) => thing
 
 /**
  * multiline
