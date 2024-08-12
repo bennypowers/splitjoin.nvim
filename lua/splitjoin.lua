@@ -9,8 +9,12 @@ local is_in_node_range = vim.treesitter.is_in_node_range
 ---@field default_indent string
 ---@field surround string[] tuple of surround strings
 ---@field separator string=','
+---@field separator_is_node boolean=true
 ---@field padding string
----@field trailing_separator boolean=true
+---@field trailing_separator boolean=true true when a trailing separator (e.g. trailing comma) is permitted/desired
+
+---@class SplitjoinLanguageConfig
+---@field nodes table<string, SplitjoinLanguageOptions>
 
 ---@class SplitjoinOptions
 ---@field default_indent string
