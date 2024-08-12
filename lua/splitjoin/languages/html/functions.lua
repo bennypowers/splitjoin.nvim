@@ -12,28 +12,36 @@ local function get_element(node)
   return element
 end
 
+---@param node TSNode
 local function split_attrs(node, options)
-  local parent = node:parent()
-  local base_indent = Node.get_base_indent(parent)
-  local indent = base_indent .. (options.default_indent or '  ')
-  if options.aligned then
-    indent = base_indent .. vim.split(Node.get_text(parent), '%s', {})[1]:gsub('.', ' ') .. ' '
-  end
-  for child in parent:iter_children() do
-    local child_type = child:type()
-    if child_type == 'attribute' then
-      local first_attr_child = child:parent():child(2)
-      local prefix = ''
-      if first_attr_child ~= child then
-        prefix = '\n'..indent
-      end
-      Node.replace(child, prefix..Node.get_text(child))
+  local element = node:parent()
+  if element then
+    local original_text = Node.get_text(element)
+    local base_indent = Node.get_base_indent(element)
+    local indent = base_indent .. (options.default_indent or '  ')
+    if options.aligned then
+      indent = base_indent .. vim.split(Node.get_text(element), '%s')[1]:gsub('.', ' ') .. ' '
     end
+    for child in element:iter_children() do
+      if child:type() == 'attribute' then
+        local attr = child
+        local first_attr_child = attr:parent():child(2)
+        local prefix = ''
+        if first_attr_child ~= child then
+          prefix = '\n'..indent
+        end
+        local new_text = prefix..Node.get_text(attr)
+        -- TODO: this fails when successfully splitting, then moving the cursor to a separate parent
+        pcall(Node.replace, attr, new_text)
+      end
+    end
+    for child in element:iter_children() do
+      pcall(Node.trim_line_end,child)
+    end
+    Node.goto_node(node, 'start', 1)
+    vim.treesitter.get_parser(0, 'html'):invalidate(true)
+    vim.treesitter.get_parser(0, 'html'):invalidate(true)
   end
-  for child in parent:iter_children() do
-    pcall(Node.trim_line_end,child)
-  end
-  Node.goto_node(node, 'start', 1)
 end
 
 local function split_children(node, options)
