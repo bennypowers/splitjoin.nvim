@@ -1,5 +1,6 @@
 local Node = require'splitjoin.util.node'
 local String = require'splitjoin.util.string'
+local Buffer = require'splitjoin.util.buffer'
 
 --- HTML Functions
 local HTML = {}
@@ -37,12 +38,36 @@ end
 local function split_attrs(node, options)
   local open_tag = node:parent()
   if open_tag then
+    -- 1. Store original node info
+    local original_node_text = Node.get_text(node)
+    local original_node_type = node:type()
+    local open_tag_srow, open_tag_scol, _, _ = open_tag:range()
+
+    -- 2. Calculate correct indentation
     local base_indent = Node.get_base_indent(open_tag)
-    local indent = base_indent .. (options.default_indent or '    ')
+    local indent
     if options.aligned then
-      indent = base_indent .. vim.split(Node.get_text(open_tag), '%s')[1]:gsub('.', ' ') .. ' '
+      local first_attr_node
+      for child in open_tag:iter_children() do
+        if child:type() == 'attribute' then
+          first_attr_node = child
+          break
+        end
+      end
+
+      if first_attr_node then
+        local _, first_attr_scol = first_attr_node:start()
+        local base_indent_len = #base_indent
+        local relative_indent_col = first_attr_scol - base_indent_len
+        indent = string.rep(' ', relative_indent_col)
+      else
+        indent = (options.default_indent or '    ')
+      end
+    else
+      indent = (options.default_indent or '    ')
     end
 
+    -- 3. Build the new string
     local append, get = String.append('')
     append('<')
     local first_attr = true
@@ -62,13 +87,44 @@ local function split_attrs(node, options)
     end
     append('>')
 
+    -- 4. Replace the node
     Node.replace(open_tag, get())
 
-    Node.goto_node(node, 'start', 1)
+    -- 5. Re-parse and find the new node to move cursor to
     vim.treesitter.get_parser(0, 'html'):invalidate(true)
-    vim.treesitter.get_parser(0, 'html'):invalidate(true)
+    local tree = vim.treesitter.get_parser(0, 'html'):parse()[1]
+    if not tree then
+      Node.goto_node(node) -- fallback
+      return
+    end
+    local root = tree:root()
+
+    local new_open_tag = root:descendant_for_range(open_tag_srow, open_tag_scol, open_tag_srow, open_tag_scol)
+
+    if new_open_tag and new_open_tag:type() == 'element' then
+        for child in new_open_tag:iter_children() do
+            if child:type() == 'start_tag' then
+                new_open_tag = child
+                break
+            end
+        end
+    end
+
+    local new_node_to_goto
+    if new_open_tag and new_open_tag:type() == 'start_tag' then
+      for child in new_open_tag:iter_children() do
+        if child:type() == original_node_type and Node.get_text(child) == original_node_text then
+          new_node_to_goto = child
+          break
+        end
+      end
+    end
+
+    -- 6. Move cursor
+    Node.goto_node(new_node_to_goto or node)
   end
 end
+
 
 local function split_children(node, options)
   local element = get_element(node)
