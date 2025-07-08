@@ -76,8 +76,26 @@ local function normalize(s)
   return (s or ""):gsub("%s+$", "")
 end
 
+local lang_ext = {
+  css = "css",
+  js  = "js",
+  javascript = "js",
+  ts  = "ts",
+  typescript = "ts",
+  go  = "go",
+  json = "json",
+  html = "html",
+  lua = "lua",
+  py  = "py",
+  python = "py",
+  md  = "md",
+  markdown = "md",
+  -- add more as needed
+}
+
 local function setup_buffer(content, lang, go_to)
-  local tmpname = "/tmp/test_" .. tostring(os.time()) .. "_" .. tostring(math.random(1e8, 1e9-1)) .. ".js"
+  local ext = lang_ext[lang] or "txt"
+  local tmpname = "/tmp/test_" .. tostring(os.time()) .. "_" .. tostring(math.random(1e8, 1e9-1)) .. "."..ext
   local f = assert(io.open(tmpname, "w"))
   f:write(content)
   f:close()
@@ -140,7 +158,7 @@ local function test_fn()
         vim.api.nvim_buf_delete(bufnr, { force = true })
       end)
       it('and rejoins as expected', function()
-        local bufnr = setup_buffer(input)
+        local bufnr = setup_buffer(input, lang, go_to)
         local before_log = log_cursor_position_in_file(bufnr)
         splitjoin.split()
         local after_split_log = log_cursor_position_in_file(bufnr)

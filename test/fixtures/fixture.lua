@@ -34,5 +34,5 @@ local function thefirst()
 end
 
 local f = function() end
-local function g() return end
+local function call() return end
 
