@@ -3,6 +3,17 @@ local String = require'splitjoin.util.string'
 
 local get_node_text = vim.treesitter.get_node_text
 
+---@param bufnr number
+---@param row number
+---@param col number
+local function clamp_cursor(bufnr, row, col)
+  local line_count = vim.api.nvim_buf_line_count(bufnr)
+  row = math.max(1, math.min(row, line_count))
+  local line_length = #vim.api.nvim_buf_get_lines(bufnr, row-1, row, false)[1]
+  col = math.max(0, math.min(col, line_length))
+  return {row, col}
+end
+
 local Node = {}
 
 -- NODE HELPERS
@@ -47,6 +58,7 @@ function Node.goto_node(node, place, col_offset)
     if place == 'end' then
       pos = { erow + 1, ecol - 1 + col_offset }
     end
+    pos = clamp_cursor(0, pos[1], pos[2])
     local success = pcall(vim.api.nvim_win_set_cursor, 0, pos)
     if not success then
       require'nvim-treesitter.ts_utils'.goto_node(node, place == 'end')

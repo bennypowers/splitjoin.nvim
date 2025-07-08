@@ -3,7 +3,7 @@ local Lua = require'splitjoin.languages.lua.functions'
 
 local get_node_text = vim.treesitter.get_node_text
 
----@type SplitjoinLanguageOptions
+---@type SplitjoinLanguageConfig
 return {
 
   nodes = {

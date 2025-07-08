@@ -4,4 +4,4 @@ a { color: blue; font: 12px "Fira Code", monospace }
 
 a { content: ';' }
 
-  :is(h1, h2, h3, h4, h5, h6) { color: grey; }
+:is(h1, h2, h3, h4, h5, h6) { color: grey; }

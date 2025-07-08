@@ -6,18 +6,18 @@ local get_parser = vim.treesitter.get_parser
 local is_in_node_range = vim.treesitter.is_in_node_range
 
 ---@class SplitjoinLanguageOptions
----@field default_indent string
----@field surround string[] tuple of surround strings
----@field separator string=','
----@field separator_is_node boolean=true
----@field padding string
----@field trailing_separator boolean=true true when a trailing separator (e.g. trailing comma) is permitted/desired
+---@field default_indent? string
+---@field surround? string[] tuple of surround strings
+---@field separator? string=','
+---@field separator_is_node? boolean=true
+---@field padding? string
+---@field trailing_separator? boolean=true true when a trailing separator (e.g. trailing comma) is permitted/desired
 
 ---@class SplitjoinLanguageConfig
 ---@field nodes table<string, SplitjoinLanguageOptions>
 
 ---@class SplitjoinOptions
----@field default_indent string
+---@field default_indent? string
 ---@field languages table<string, SplitjoinLanguageOptions>
 
 local Splitjoin = {}
