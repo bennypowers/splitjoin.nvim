@@ -25,13 +25,14 @@ function M.setup()
 
   require'nvim-treesitter.configs'.setup {
     ensure_installed = {
-      'lua',
       'css',
-      'json',
-      'jsdoc',
-      'javascript',
-      'typescript',
+      'go',
       'html',
+      'javascript',
+      'jsdoc',
+      'json',
+      'lua',
+      'typescript',
     },
     sync_install = true,
   }
