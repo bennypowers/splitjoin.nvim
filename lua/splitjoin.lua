@@ -25,8 +25,8 @@ local Splitjoin = {}
 local function get_operable_node_under_cursor(bufnr, winnr)
   local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
   local cursor_range = { row - 1, col, row - 1, col }
-  -- TODO: cache a reference per bufnr
-  local tsparser = get_parser(bufnr) if tsparser == nil then return end
+  local tsparser = get_parser(bufnr)
+     if tsparser == nil then return end
         tsparser:parse()
   local langtree = tsparser:language_for_range(cursor_range);
   local tstree = langtree:tree_for_range(cursor_range, { ignore_injections = false }) or langtree:trees()[1]
@@ -62,7 +62,7 @@ local function splitjoin(op)
     local node, options = get_operable_node_under_cursor(bufnr, winnr)
     if node then
       local handler = options and options[op] or DefaultHandlers[op]
-      handler(node, options, Options)
+      handler(node, options)
     end
   end
 end

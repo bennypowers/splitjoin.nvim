@@ -111,8 +111,7 @@ local function setup_buffer(content, lang, go_to)
 
   local bufnr = vim.api.nvim_get_current_buf()
 
-  local ts_parsers = require('nvim-treesitter.parsers')
-  local parser = ts_parsers.get_parser(bufnr, lang)
+  local parser = vim.treesitter.get_parser(bufnr, lang)
   if parser then parser:parse() end
   vim.wait(100)
 
