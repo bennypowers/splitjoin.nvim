@@ -123,6 +123,34 @@ end
 
 function ECMAScript.join_comment(node, options)
   local text = Node.get_text(node)
+
+  if vim.startswith(text, '/**') and String.is_multiline(text) then
+    -- Join JSDoc comment
+    local description = text
+      :gsub("^/%*%*", "")
+      :gsub("%*/$", "")
+      :gsub("\r", "")
+      :gsub("^\n*", "")
+      :gsub("\n%s*%*%s?", "\n") -- Remove leading * on every line
+      :gsub("^%s*%*%s?", "")    -- Remove * at the start if present
+      :gsub("^%s+", "")         -- Trim leading whitespace
+      :gsub("%s+$", "")         -- Trim trailing whitespace
+
+    if not description:find("\n") then
+      Node.replace(node, '/** ' .. description .. ' */')
+    else
+      -- Reformat multiline comment
+      local indent = options and options.default_indent or ' '
+      local lines = {}
+      for line in description:gmatch("[^\n]+") do
+        table.insert(lines, indent .. '* ' .. line)
+      end
+      Node.replace(node, '/**\n' .. table.concat(lines, '\n') .. '\n' .. indent .. '*/')
+    end
+    Node.goto_node(node)
+    return
+  end
+
   if String.is_multiline(text) or vim.startswith(text, '//') then return end
   local row, col = node:range()
   local comment = vim.treesitter.get_node{ pos = { row, col - 1 } }
@@ -151,5 +179,7 @@ function ECMAScript.join_comment(node, options)
   end
   Node.goto_node(comment)
 end
+
+
 
 return ECMAScript
