@@ -74,44 +74,80 @@ local function split_children(node, options)
   local element = get_element(node)
   local base_indent = Node.get_base_indent(element)
   local indent = base_indent .. (options.default_indent or '  ')
+
+  local start_tag
+  local end_tag
+  local children = {}
   for child in element:iter_children() do
     local type = child:type()
-    local prefix = '\n'..indent
-    if type ~= 'start_tag' and type ~= 'end_tag' then
-      Node.replace(child, prefix..Node.get_text(child))
+    if type == 'start_tag' then
+      start_tag = child
     elseif type == 'end_tag' then
-      Node.replace(child, '\n'..base_indent..Node.get_text(child))
+      end_tag = child
+    else
+      table.insert(children, child)
     end
   end
-  Node.goto_node(node, 'start', -1)
+
+  if not start_tag then return nil end
+
+  local new_text = Node.get_text(start_tag)
+  for _, child in ipairs(children) do
+    new_text = new_text .. '\n' .. indent .. vim.trim(Node.get_text(child))
+  end
+  if end_tag then
+    new_text = new_text .. '\n' .. base_indent .. Node.get_text(end_tag)
+  end
+
+  local original_node_text = vim.trim(Node.get_text(node))
+  local original_node_type = node:type()
+  local srow, scol = element:start()
+
+  Node.replace(element, new_text)
+
+  vim.treesitter.get_parser(0, 'html'):invalidate(true)
+  local tree = vim.treesitter.get_parser(0, 'html'):parse()[1]
+  if not tree then return node end
+  local root = tree:root()
+
+  local new_element = root:descendant_for_range(srow, scol, srow, scol)
+  if not new_element then return node end
+
+  while new_element and new_element:type() ~= 'element' do
+    new_element = new_element:parent()
+  end
+
+  if new_element then
+    for child in new_element:iter_children() do
+      if child:type() == original_node_type and vim.trim(Node.get_text(child)) == original_node_text then
+        return child
+      end
+    end
+  end
+
+  return node -- Return old node as fallback
 end
+
 
 local function join_children(node, options)
   local element = get_element(node)
-  local append, get = String.append('')
-
-  for child in element:iter_children() do
-    local type = child:type()
-    if type == 'start_tag' or type == 'end_tag' then
-      append(vim.trim(Node.get_text(child)))
-    else
-      append(vim.trim(Node.get_text(child)))
-    end
-  end
-
-  Node.replace(element, get())
+  local text = Node.get_text(element)
+  text = text:gsub('\n%s*', ''):gsub('> ', '>')
+  Node.replace(element, text)
   Node.refresh(element)
   for child in element:iter_children() do if child:id() == node:id() then node = child end end
   Node.goto_node(node, 'start', 1)
 end
+
+
 
 function HTML.split(node, options)
   local capture = options.capture:gsub('splitjoin%.html%.', '')
   if capture == 'attr' then
     split_attrs(node, options)
   elseif capture == 'text' or capture == 'tag.start' or capture == 'tag.end' then
-    split_children(node, options)
-    Node.goto_node(node)
+    local new_node = split_children(node, options)
+    Node.goto_node(new_node)
   end
 end
 
