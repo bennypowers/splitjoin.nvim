@@ -5,3 +5,5 @@
   (selectors
     (_
        (arguments) @splitjoin.css.arguments)))
+
+((arguments) @splitjoin.css.arguments)
