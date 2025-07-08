@@ -1,10 +1,11 @@
 local Node = require'splitjoin.util.node'
 local String = require'splitjoin.util.string'
-local Buffer = require'splitjoin.util.buffer'
 
 --- HTML Functions
 local HTML = {}
 
+---@param node TSNode
+---@return TSNode
 local function get_element(node)
   local element = node:parent()
   while element and element:type() ~= 'element' do
@@ -13,7 +14,7 @@ local function get_element(node)
   return element
 end
 
-local function join_attrs(parent, options)
+local function join_attrs(parent)
   local append, get = String.append('')
 
   append('<')

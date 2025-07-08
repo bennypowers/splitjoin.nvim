@@ -1,17 +1,8 @@
 local Node = require'splitjoin.util.node'
-local Buffer = require'splitjoin.util.buffer'
 
 local get_node_text = vim.treesitter.get_node_text
 
-
-local function get_enclosing_union_node()
-  local node = vim.treesitter.get_node()
-  while node and node:type() ~= "union_type" do
-    node = node:parent()
-  end
-  return node
-end
-
+---@param fn_node TSNode
 local function find_matching_descendant(fn_node, ctx)
   local stack = {fn_node}
   while #stack > 0 do
@@ -44,7 +35,7 @@ local function save_cursor_node_context()
   while parent_union and parent_union:type() ~= "union_type" do
     parent_union = parent_union:parent()
   end
-  local union_start_row, union_start_col = parent_union and parent_union:start() or node:start()
+  local union_start_row, _ = parent_union and parent_union:start() or node:start()
   local node_start_row, node_start_col = node:start()
   local rel_row = node_start_row - union_start_row
   local rel_col = node_start_col
