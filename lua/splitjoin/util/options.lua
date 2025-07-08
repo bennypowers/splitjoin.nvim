@@ -22,6 +22,7 @@ local function get_defaults()
       json = require'splitjoin.languages.json.defaults',
       html = require'splitjoin.languages.html.defaults',
       css = require'splitjoin.languages.css.defaults',
+      go = require'splitjoin.languages.go.defaults',
     },
   }
   for name, mod in pairs(defaults.languages) do

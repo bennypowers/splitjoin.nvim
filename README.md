@@ -78,7 +78,9 @@ After:
 
 - **ecmascript**: object, array, params, arguments
 - **lua**: table, params, arguments, variable_lists
+- **html**: tags, attributes
 - **css**: rules (blocks)
+- **go**: parameter lists, structs, return lists, arguments, slices, etc
 
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim
