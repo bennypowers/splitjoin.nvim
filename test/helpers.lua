@@ -43,53 +43,43 @@ function M.make_suite(lang, name, input, expected, go_to)
   local assert = require 'luassert'
   local splitjoin = require'splitjoin'
 
-  function test()
+  local function setup_buffer(content)
+    local bufnr = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_win_set_buf(0, bufnr)
+    vim.opt.filetype = lang
+    local lines = vim.split(content, '\n', { plain = true, trimempty = false })
+    vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, lines)
+    if type(go_to) == 'string' then
+      vim.fn.search(go_to)
+    elseif type(go_to) == 'table' then
+      vim.api.nvim_win_set_cursor(0, go_to)
+    end
+    return bufnr
+  end
+
+  local function test_fn()
     describe('splits', function()
-        local bufnr
-
-        local function create ()
-          if not bufnr then
-            bufnr = vim.api.nvim_create_buf(true, false)
-            vim.api.nvim_win_set_buf(0, bufnr)
-            vim.opt.filetype = lang
-            local lines = vim.split(input, '\n', { plain = true, trimempty = false })
-            vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, lines)
-            if type(go_to) == 'string' then
-              vim.fn.search(go_to)
-            elseif type(go_to) == 'table' then
-              vim.api.nvim_win_set_cursor(0, go_to)
-            end
-          end
-        end
-
-        local function destroy()
-          vim.api.nvim_buf_delete(bufnr, { force = true })
-          bufnr = nil
-        end
-
-      before_each(create)
-      after_each(destroy)
-
       it('as expected', function()
+        local bufnr = setup_buffer(input)
         splitjoin.split()
         assert.same(expected, M.get_buf_text(bufnr))
+        vim.api.nvim_buf_delete(bufnr, { force = true })
       end)
-      describe('and rejoins', function()
-        it('as expected', function()
-          splitjoin.split()
-          splitjoin.join()
-          assert.same(input, M.get_buf_text(bufnr))
-        end)
+      it('and rejoins as expected', function()
+        local bufnr = setup_buffer(input)
+        splitjoin.split()
+        splitjoin.join()
+        assert.same(input, M.get_buf_text(bufnr))
+        vim.api.nvim_buf_delete(bufnr, { force = true })
       end)
     end)
   end
 
-  if (#name) then
-    describe(name, test)
+  if (#name > 0) then
+    describe(name, test_fn)
   else
-    test()
-    end
+    test_fn()
+  end
 end
 
 return M
-
