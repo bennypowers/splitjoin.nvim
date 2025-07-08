@@ -1,35 +1,29 @@
 local helpers = require'test.helpers'
+local d = require'plenary.strings'.dedent
 
-describe("go", function ()
-  describe("struct", function ()
-local joined = [[
+describe("go", function()
+  describe("struct", function()
+    local joined = [[
 type User struct { Name string; Age int; Email string }
 ]]
 
-local split = [[
+    local split = [[
 type User struct {
-  Name string,
-  Age int,
-  Email string,
+  Name string
+  Age int
+  Email string
 }
 ]]
 
-helpers.make_suite(
-  'go',
-  'splits and joins struct fields',
-  joined,
-  split,
-  '{'
-)
-
+    helpers.make_suite('go', 'splits and joins struct fields', joined, split, '{')
   end)
-  describe("params and return", function ()
 
-local joined = [[
+  describe("params and return", function()
+    local joined = [[
 func Foo(a int, b string) (int, error) {}
 ]]
 
-local split = [[
+    local split = [[
 func Foo(
   a int,
   b string,
@@ -39,20 +33,15 @@ func Foo(
 ) {}
 ]]
 
-helpers.make_suite(
-  'go',
-  'splits and joins function params and return types',
-  joined,
-  split,
-  'Foo'
-)
-end)
-  describe("args", function ()
-local joined = [[
+    helpers.make_suite('go', 'splits and joins function params and return types', joined, split, 'Foo')
+  end)
+
+  describe("args", function()
+    local joined = [[
 Foo(a, b, c)
 ]]
 
-local split = [[
+    local split = [[
 Foo(
   a,
   b,
@@ -60,14 +49,54 @@ Foo(
 )
 ]]
 
-helpers.make_suite(
-  'go',
-  'splits and joins function arguments',
-  joined,
-  split,
-  'Foo'
-)
+    helpers.make_suite('go', 'splits and joins function arguments', joined, split, 'Foo')
+  end)
+
+  describe("slice", function()
+    local joined = d[=[
+      []string{"a", "b", "c"}
+    ]=]
+
+    local split = d[=[
+      []string{
+        "a",
+        "b",
+        "c",
+      }
+    ]=]
+
+    helpers.make_suite('go', 'splits and joins slice literals', joined, split, '{')
+  end)
+
+  describe("map", function()
+    local joined = d[=[
+      map[string]int{"a": 1, "b": 2, "c": 3}
+    ]=]
+
+    local split = d[=[
+      map[string]int{
+        "a": 1,
+        "b": 2,
+        "c": 3,
+      }
+    ]=]
+
+    helpers.make_suite('go', 'splits and joins map literals', joined, split, '{')
+  end)
+
+  describe("composite literal", function()
+    local joined = d[=[
+      User{Name: "a", Age: 1, Email: "b"}
+    ]=]
+
+    local split = d[=[
+      User{
+        Name: "a",
+        Age: 1,
+        Email: "b",
+      }
+    ]=]
+
+    helpers.make_suite('go', 'splits and joins composite literals', joined, split, '{')
   end)
 end)
-
-
