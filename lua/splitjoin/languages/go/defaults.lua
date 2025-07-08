@@ -1,33 +1,24 @@
 local Node = require'splitjoin.util.node'
--- local DefaultHandlers = require'splitjoin.util.handlers'
+local Go = require'splitjoin.languages.go.functions'
 
 ---@type SplitjoinLanguageConfig
 return {
   default_indent = '  ',
-  trailing_separator = true,
   nodes = {
     -- Go struct fields
     field_declaration_list = {
       surround = { '{', '}' },
-      separator = ',',
-      split = Node.split,
-      join = Node.join,
+      split = Go.split_struct,
+      join = Go.join_struct,
     },
 
-    -- Go function parameters
+    -- Go function parameters and return lists
     parameter_list = {
       surround = { '(', ')' },
       separator = ',',
       split = Node.split,
       join = Node.join,
-    },
-
-    -- Go function returns (can be a parenthesized result group)
-    result = {
-      surround = { '(', ')' },
-      separator = ',',
-      split = Node.split,
-      join = Node.join,
+      trailing_separator = true,
     },
 
     -- Go function call arguments
@@ -37,5 +28,13 @@ return {
       split = Node.split,
       join = Node.join,
     },
+
+    -- Go slice, map, and composite literals
+    literal_value = {
+      surround = { '{', '}' },
+      separator = ',',
+      split = Node.split,
+      join = Node.join,
+    }
   }
 }

@@ -62,7 +62,7 @@ local function splitjoin(op)
     local node, options = get_operable_node_under_cursor(bufnr, winnr)
     if node then
       local handler = options and options[op] or DefaultHandlers[op]
-      handler(node, options)
+      handler(node, options, Options)
     end
   end
 end

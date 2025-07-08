@@ -18,7 +18,7 @@ type User struct {
     helpers.make_suite('go', 'splits and joins struct fields', joined, split, '{')
   end)
 
-  describe("params and return", function()
+  describe("params", function()
     local joined = [[
 func Foo(a int, b string) (int, error) {}
 ]]
@@ -27,15 +27,26 @@ func Foo(a int, b string) (int, error) {}
 func Foo(
   a int,
   b string,
-) (
+) (int, error) {}
+]]
+
+    helpers.make_suite('go', 'splits and joins function params', joined, split, 'a')
+  end)
+
+  describe("return", function()
+    local joined = [[
+func Foo(a int, b string) (int, error) {}
+]]
+
+    local split = [[
+func Foo(a int, b string) (
   int,
   error,
 ) {}
 ]]
 
-    helpers.make_suite('go', 'splits and joins function params and return types', joined, split, 'Foo')
+    helpers.make_suite('go', 'splits and joins return types', joined, split, 'error')
   end)
-
   describe("args", function()
     local joined = [[
 Foo(a, b, c)
@@ -49,7 +60,7 @@ Foo(
 )
 ]]
 
-    helpers.make_suite('go', 'splits and joins function arguments', joined, split, 'Foo')
+    helpers.make_suite('go', 'splits and joins function arguments', joined, split, 'a')
   end)
 
   describe("slice", function()
