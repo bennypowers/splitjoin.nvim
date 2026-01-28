@@ -1,10 +1,10 @@
 local M = {}
+local Setup = require 'test.setup'
 
 local tmpfiles = {}
 
 function M.root(root)
-  local f = debug.getinfo(1, "S").source:sub(2)
-  return vim.fn.fnamemodify(f, ":p:h:h") .. "/" .. (root or "")
+  return Setup.root(root)
 end
 
 local function file_exists(file)

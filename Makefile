@@ -1,4 +1,20 @@
-.PHONY: test
+SHELL:=/usr/bin/env bash
+.PHONY: test watch clean
+
+clean:
+	@rm -rf .test
+
+watch:
+	@echo "Testing..."
+	@find . \
+		-type f \
+		-name '*.lua' \
+		! -path "./.test/**/*" | entr -d make test
 
 test:
-	nvim --headless -u test/init.lua -c "lua local file = os.getenv('TEST_FILE') or 'test/'; require'plenary.test_harness'.test_directory(file, {minimal_init='test/init.lua',sequential=true})"
+	@nvim \
+		--headless \
+		--noplugin \
+		-u test/bootstrap.lua \
+		-c "PlenaryBustedDirectory test/ {minimal_init='test/init.lua',sequential=true,keep_going=false}" \
+		-c "qa!"
