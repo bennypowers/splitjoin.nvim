@@ -1,12 +1,11 @@
 local Node = require'splitjoin.util.node'
 local String = require'splitjoin.util.string'
-local ts_utils = require"nvim-treesitter.ts_utils"
 local get_text = Node.get_text
 
 local Lua = {}
 
 local function save_cursor_node_context()
-  local node = ts_utils.get_node_at_cursor()
+  local node = vim.treesitter.get_node()
   if not node then return nil end
   local node_type = node:type()
   local node_text = get_text(node)
@@ -28,7 +27,7 @@ local function save_cursor_node_context()
 end
 
 local function get_enclosing_function_node()
-  local node = ts_utils.get_node_at_cursor()
+  local node = vim.treesitter.get_node()
   while node and not vim.tbl_contains({"function_declaration", "function_definition"}, node:type()) do
     node = node:parent()
   end

@@ -59,10 +59,7 @@ function Node.goto_node(node, place, col_offset)
       pos = { erow + 1, ecol - 1 + col_offset }
     end
     pos = clamp_cursor(0, pos[1], pos[2])
-    local success = pcall(vim.api.nvim_win_set_cursor, 0, pos)
-    if not success then
-      require'nvim-treesitter.ts_utils'.goto_node(node, place == 'end')
-    end
+    pcall(vim.api.nvim_win_set_cursor, 0, pos)
   end
 end
 

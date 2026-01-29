@@ -20,11 +20,24 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
       - name: Install Neovim
         uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
           version: ${{ matrix.nvim-versions }}
+
+      - name: Cache treesitter parsers
+        uses: actions/cache@v4
+        with:
+          path: .test/site/parser/
+          key: ${{ runner.os }}-${{ matrix.nvim-versions }}-parsers-${{ hashFiles('test/bootstrap.lua', 'test/setup.lua') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.nvim-versions }}-parsers-
+
       - name: Run Tests
         run: |
           nvim --version
