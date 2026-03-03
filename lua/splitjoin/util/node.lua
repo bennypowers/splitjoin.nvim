@@ -168,7 +168,6 @@ function Node.split(node, options)
       if     type == open then  table.insert(lines, open..'\n')
       elseif type == sep then
         flush_parts()
-        table.insert(lines, '\n')
       elseif type == close then
         flush_parts()
         table.insert(lines, close)
