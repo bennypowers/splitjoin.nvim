@@ -145,19 +145,49 @@ end
 function Node.split(node, options)
   local indent = options.default_indent or '  '
   local sep = options.separator or ','
-  local separator_is_node = options.separator_is_node or true
+  local separator_is_node = options.separator_is_node ~= false
   local open, close = unpack(options.surround or {})
   local lines = {}
 
-  for child in node:iter_children() do
-    local type = child:type()
-    if     type == open then  table.insert(lines, open..'\n')
-    elseif type == sep then   table.insert(lines, (separator_is_node and '\n' or ''))
-    elseif type == close then table.insert(lines, close)
-    else
-      local text = vim.trim(Node.get_text(child)):gsub(sep..'$', '')
-      local line = indent .. text .. sep
-      table.insert(lines, line..(separator_is_node and '\n' or ''))
+  if separator_is_node then
+    -- Group consecutive non-separator children as a single argument
+    -- (e.g. CSS `to bottom` is two nodes but one argument)
+    local current_parts = {}
+
+    local function flush_parts()
+      if #current_parts > 0 then
+        local text = table.concat(current_parts, ' ')
+        local line = indent .. text .. sep
+        table.insert(lines, line..'\n')
+        current_parts = {}
+      end
+    end
+
+    for child in node:iter_children() do
+      local type = child:type()
+      if     type == open then  table.insert(lines, open..'\n')
+      elseif type == sep then
+        flush_parts()
+      elseif type == close then
+        flush_parts()
+        table.insert(lines, close)
+      else
+        local text = vim.trim(Node.get_text(child)):gsub(sep..'$', '')
+        table.insert(current_parts, text)
+      end
+    end
+    flush_parts()
+  else
+    for child in node:iter_children() do
+      local type = child:type()
+      if     type == open then  table.insert(lines, open..'\n')
+      elseif type == sep then   table.insert(lines, '')
+      elseif type == close then table.insert(lines, close)
+      else
+        local text = vim.trim(Node.get_text(child)):gsub(sep..'$', '')
+        local line = indent .. text .. sep
+        table.insert(lines, line..'\n')
+      end
     end
   end
 
@@ -179,6 +209,7 @@ end
 function Node.join(node, options)
   local replacement = ''
   local sep = options.separator or ','
+  local separator_is_node = options.separator_is_node ~= false
   local open, close = unpack(options.surround or {})
   local padding = options.padding or ''
 
@@ -197,7 +228,7 @@ function Node.join(node, options)
       else
         append(sep, ' ') -- TODO: inner vs outer padding
       end
-    elseif options.separator_is_node == false then
+    elseif not separator_is_node then
       local text = vim.trim(Node.get_text(child)):gsub(sep..'$', '')
       if Node.next_sibling_is(child, close) then
         append(text)
@@ -205,7 +236,16 @@ function Node.join(node, options)
         append(text..sep, ' ') -- TODO: inner vs outer padding
       end
     else
-      append(vim.trim(Node.get_text(child)))
+      local text = vim.trim(Node.get_text(child))
+      local next_sib = child:next_sibling()
+      local next_type = next_sib and next_sib:type()
+      -- Add space between consecutive non-separator siblings
+      -- (e.g. CSS `to bottom` are two nodes forming one argument)
+      if next_type and next_type ~= sep and next_type ~= close then
+        append(text, ' ')
+      else
+        append(text)
+      end
     end
   end
   Node.replace(node, replacement)
