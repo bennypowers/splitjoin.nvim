@@ -209,6 +209,7 @@ end
 function Node.join(node, options)
   local replacement = ''
   local sep = options.separator or ','
+  local separator_is_node = options.separator_is_node ~= false
   local open, close = unpack(options.surround or {})
   local padding = options.padding or ''
 
@@ -227,7 +228,7 @@ function Node.join(node, options)
       else
         append(sep, ' ') -- TODO: inner vs outer padding
       end
-    elseif options.separator_is_node == false then
+    elseif not separator_is_node then
       local text = vim.trim(Node.get_text(child)):gsub(sep..'$', '')
       if Node.next_sibling_is(child, close) then
         append(text)
