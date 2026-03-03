@@ -59,6 +59,36 @@ describe(lang, function()
       '1'
     )
 
+    H.make_suite(lang, 'arguments with multi-word values',
+      d[[
+        background: linear-gradient(to bottom, #d4d3d2, #dbdad9);
+      ]],
+      d[[
+        background: linear-gradient(
+          to bottom,
+          #d4d3d2,
+          #dbdad9
+        );
+      ]],
+      'to bottom'
+    )
+
+    H.make_suite(lang, 'arguments with nested function calls',
+      d[[
+        background: linear-gradient(to bottom, light-dark(#d4d3d2, #333333), light-dark(#dbdad9, #383838), light-dark(#e2e1e0, #3c3c3c), light-dark(#eaeae9, #404040));
+      ]],
+      d[[
+        background: linear-gradient(
+          to bottom,
+          light-dark(#d4d3d2, #333333),
+          light-dark(#dbdad9, #383838),
+          light-dark(#e2e1e0, #3c3c3c),
+          light-dark(#eaeae9, #404040)
+        );
+      ]],
+      'to bottom'
+    )
+
   end)
 
 end)
