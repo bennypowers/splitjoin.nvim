@@ -14,5 +14,6 @@ ts.install({
   'jsdoc',
   'json',
   'lua',
+  'python',
   'typescript',
 }):wait(30000)

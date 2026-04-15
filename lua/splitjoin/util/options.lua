@@ -23,6 +23,7 @@ local function get_defaults()
       html = require'splitjoin.languages.html.defaults',
       css = require'splitjoin.languages.css.defaults',
       go = require'splitjoin.languages.go.defaults',
+      python = require'splitjoin.languages.python.defaults',
     },
   }
   for name, mod in pairs(defaults.languages) do
