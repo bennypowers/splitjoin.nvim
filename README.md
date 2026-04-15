@@ -81,6 +81,7 @@ After:
 - **html**: tags, attributes
 - **css**: rules (blocks)
 - **go**: parameter lists, structs, return lists, arguments, slices, etc
+- **python**: parameters, arguments, lists, dictionaries, tuples, sets
 
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim

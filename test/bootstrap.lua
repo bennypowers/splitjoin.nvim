@@ -1,3 +1,4 @@
+package.path = './?.lua;./?/init.lua;' .. package.path
 local Setup = require 'test.setup'
 
 Setup.load 'nvim-lua/plenary.nvim'
@@ -14,5 +15,6 @@ ts.install({
   'jsdoc',
   'json',
   'lua',
+  'python',
   'typescript',
 }):wait(30000)
