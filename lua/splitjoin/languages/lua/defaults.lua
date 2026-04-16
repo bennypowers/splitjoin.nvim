@@ -44,7 +44,12 @@ return {
       split = function(node)
         local source = get_node_text(node, 0)
         local is_variable_decl = Node.is_child_of('variable_declaration', node)
-        local indent = is_variable_decl and '      ' or ''
+        local indent = ''
+        if is_variable_decl then
+          local _, scol = node:child(0):start()
+          local base_len = #(Node.get_base_indent(node))
+          indent = string.rep(' ', scol - base_len)
+        end
         local new = source:gsub(',%s*',',\n'..indent)
         Node.replace(node, new)
         Node.goto_node(node)
