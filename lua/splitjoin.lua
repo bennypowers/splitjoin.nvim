@@ -59,21 +59,36 @@ local function get_operable_node_under_cursor(bufnr, winnr)
   end
 end
 
-local function splitjoin(op)
+local _last_op = nil
+
+local function do_splitjoin(op)
+  local Node = require'splitjoin.util.node'
+  local node, options = get_operable_node_under_cursor(0, 0)
+  if not node then return end
+  if op == 'toggle' then
+    op = Node.get_text(node):find('\n') and 'join' or 'split'
+  end
+  local handler = options and options[op] or Node[op]
+  handler(node, options)
+end
+
+--- Operatorfunc callback for dot-repeat support.
+--- Changes within the operatorfunc are grouped into a single undo entry.
+function Splitjoin._opfunc(_)
+  if _last_op then do_splitjoin(_last_op) end
+end
+
+local function make_action(op)
   return function()
-    local Node = require'splitjoin.util.node'
-    local bufnr = 0
-    local winnr = 0
-    local node, options = get_operable_node_under_cursor(bufnr, winnr)
-    if node then
-      local handler = options and options[op] or Node[op]
-      handler(node, options)
-    end
+    _last_op = op
+    vim.go.operatorfunc = "v:lua.require'splitjoin'._opfunc"
+    vim.cmd('normal! g@l')
   end
 end
 
-Splitjoin.join = splitjoin'join'
-Splitjoin.split = splitjoin'split'
+Splitjoin.join = make_action'join'
+Splitjoin.split = make_action'split'
+Splitjoin.toggle = make_action'toggle'
 
 function Splitjoin.setup(opts)
   require'splitjoin.util.options'.setup(opts)
