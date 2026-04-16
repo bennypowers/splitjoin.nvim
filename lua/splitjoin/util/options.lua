@@ -43,7 +43,9 @@ local function ensure_initialized()
   if type(user_config) == 'function' then user_config = user_config() end
   for lang, mod in pairs(OPTIONS.languages) do
     local lang_options = try_require('splitjoin.languages.'..lang..'.options')
-    local parent_options = try_require('splitjoin.languages.' .. (mod.extends or '.') ..'.options')
+    local parent_options = mod.extends
+      and try_require('splitjoin.languages.' .. mod.extends .. '.options')
+      or {}
     local passed = user_config and user_config.languages and user_config.languages[lang] or {}
     OPTIONS.languages[lang] =
       vim.tbl_deep_extend('force', OPTIONS.languages[lang], parent_options, lang_options, passed)

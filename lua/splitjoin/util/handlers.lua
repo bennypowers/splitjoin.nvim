@@ -9,7 +9,7 @@ function DefaultHandlers.split(node, options)
   local source = Node.get_text(node)
   local open, close = unpack(options.surround or {})
   local di = options.default_indent
-  local indent = type(di) == 'function' and di() or di or '  '
+  local indent = (type(di) == 'function' and di() or di) or '  '
   local sep = options.separator or ','
 
   local unsurrounded = source
