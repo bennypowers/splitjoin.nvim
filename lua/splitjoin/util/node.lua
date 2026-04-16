@@ -33,7 +33,7 @@ function Node.next_sibling_is(node, type)
   return next and next:type() == type
 end
 
-local parsers = {}
+local parsers = setmetatable({}, { __mode = 'k' })
 
 ---@param node TSNode
 function Node.cache_parser(node, parser)
