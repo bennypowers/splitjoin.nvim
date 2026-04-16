@@ -11,21 +11,14 @@ local function try_require(spec)
 end
 
 local function get_defaults()
-  local defaults = {
-    languages = {
-      -- TODO: generate these
-      lua = require'splitjoin.languages.lua.defaults',
-      ecmascript = require'splitjoin.languages.ecmascript.defaults',
-      javascript = require'splitjoin.languages.javascript.defaults',
-      typescript = require'splitjoin.languages.typescript.defaults',
-      jsdoc = require'splitjoin.languages.jsdoc.defaults',
-      json = require'splitjoin.languages.json.defaults',
-      html = require'splitjoin.languages.html.defaults',
-      css = require'splitjoin.languages.css.defaults',
-      go = require'splitjoin.languages.go.defaults',
-      python = require'splitjoin.languages.python.defaults',
-    },
-  }
+  local defaults = { languages = {} }
+  local files = vim.api.nvim_get_runtime_file('lua/splitjoin/languages/*/defaults.lua', true)
+  for _, file in ipairs(files) do
+    local lang = file:match('languages/([^/]+)/defaults%.lua$')
+    if lang then
+      defaults.languages[lang] = require('splitjoin.languages.' .. lang .. '.defaults')
+    end
+  end
   for name, mod in pairs(defaults.languages) do
     if mod.extends and defaults.languages[mod.extends] then
       defaults.languages[name] = vim.tbl_deep_extend('keep', mod, defaults.languages[mod.extends])
