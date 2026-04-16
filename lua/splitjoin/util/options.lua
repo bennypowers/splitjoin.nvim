@@ -34,28 +34,41 @@ local function get_defaults()
   return copy(defaults)
 end
 
-local OPTIONS = get_defaults()
+local OPTIONS = nil
 
--- CONFIG AND OPTS
-function Options.get_options_for(lang, type)
-  local _, options = pcall(function() return OPTIONS.languages[lang] end)
-  options = options or {}
-  options.nodes = options.nodes or {}
-  return options.nodes[type] or {}
-end
-
-function Options.setup(opts)
+local function ensure_initialized()
+  if OPTIONS then return end
+  OPTIONS = get_defaults()
+  local user_config = vim.g.splitjoin
+  if type(user_config) == 'function' then user_config = user_config() end
   for lang, mod in pairs(OPTIONS.languages) do
-    local original = OPTIONS.languages[lang]
-    local options = try_require('splitjoin.languages.'..lang..'.options')
-    local passed = opts and opts.languages and opts.languages[lang] or {}
-    local parent = try_require('splitjoin.languages.' .. (mod.extends or '.') ..'.options')
-    local defaults = get_defaults().languages[lang]
+    local lang_options = try_require('splitjoin.languages.'..lang..'.options')
+    local parent_options = try_require('splitjoin.languages.' .. (mod.extends or '.') ..'.options')
+    local passed = user_config and user_config.languages and user_config.languages[lang] or {}
     OPTIONS.languages[lang] =
-      vim.tbl_deep_extend('force', original, options, parent, mod, passed, defaults)
+      vim.tbl_deep_extend('force', OPTIONS.languages[lang], parent_options, lang_options, passed)
+    -- Propagate language-level default_indent to nodes that don't define their own
+    local di = OPTIONS.languages[lang].default_indent
+    if di then
+      for _, node_opts in pairs(OPTIONS.languages[lang].nodes or {}) do
+        if node_opts.default_indent == nil then
+          node_opts.default_indent = di
+        end
+      end
+    end
   end
 end
 
-Options.setup()
+-- CONFIG AND OPTS
+function Options.get_options_for(lang, type)
+  ensure_initialized()
+  local lang_opts = OPTIONS.languages[lang] or {}
+  return (lang_opts.nodes or {})[type] or {}
+end
+
+function Options.setup(opts)
+  vim.g.splitjoin = opts
+  OPTIONS = nil
+end
 
 return Options

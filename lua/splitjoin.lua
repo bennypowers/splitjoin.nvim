@@ -1,10 +1,3 @@
-local Options = require'splitjoin.util.options'
-local Node = require'splitjoin.util.node'
-local DefaultHandlers = require'splitjoin.util.handlers'
-local get_query = vim.treesitter.query and vim.treesitter.query.get or vim.treesitter.get_query
-local get_parser = vim.treesitter.get_parser
-local is_in_node_range = vim.treesitter.is_in_node_range
-
 ---@class SplitjoinLanguageOptions
 ---@field default_indent? string
 ---@field surround? string[] tuple of surround strings
@@ -23,6 +16,12 @@ local is_in_node_range = vim.treesitter.is_in_node_range
 local Splitjoin = {}
 
 local function get_operable_node_under_cursor(bufnr, winnr)
+  local Options = require'splitjoin.util.options'
+  local Node = require'splitjoin.util.node'
+  local get_query = vim.treesitter.query and vim.treesitter.query.get or vim.treesitter.get_query
+  local get_parser = vim.treesitter.get_parser
+  local is_in_node_range = vim.treesitter.is_in_node_range
+
   local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
   local cursor_range = { row - 1, col, row - 1, col }
   local tsparser = get_parser(bufnr)
@@ -57,6 +56,7 @@ end
 
 local function splitjoin(op)
   return function()
+    local DefaultHandlers = require'splitjoin.util.handlers'
     local bufnr = 0
     local winnr = 0
     local node, options = get_operable_node_under_cursor(bufnr, winnr)
@@ -69,6 +69,9 @@ end
 
 Splitjoin.join = splitjoin'join'
 Splitjoin.split = splitjoin'split'
-Splitjoin.setup = function(opts) Options.setup(opts) end
+
+function Splitjoin.setup(opts)
+  require'splitjoin.util.options'.setup(opts)
+end
 
 return Splitjoin
