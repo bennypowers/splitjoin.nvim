@@ -77,7 +77,7 @@ function ECMAScript.join_arrow_function(node, options)
       append('=>', ' ')
       local next = child:next_sibling()
       if next:type() == 'statement_block' then
-        local ainiklech = {}
+        local ainiklech = {} -- אייניקלעך: grandchildren (inner statements)
         for gc in next:iter_children() do
           local gctype = gc:type()
           if gctype ~= '{' and gctype ~= '}' then

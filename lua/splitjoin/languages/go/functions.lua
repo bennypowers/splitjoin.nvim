@@ -1,4 +1,4 @@
-local Node = require("splitjoin.util.node")
+local Node = require'splitjoin.util.node'
 
 local M = {}
 
