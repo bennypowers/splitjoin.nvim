@@ -1,5 +1,3 @@
-local Node = require'splitjoin.util.node'
-
 ---@type SplitjoinLanguageConfig
 return {
 
@@ -7,15 +5,11 @@ return {
 
     object = {
       surround = { '{', '}' },
-      split = Node.split,
-      join = Node.join,
       trailing_separator = false,
     },
 
     array = {
       surround = { '[', ']' },
-      split = Node.split,
-      join = Node.join,
       trailing_separator = false,
     },
 

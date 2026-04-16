@@ -56,12 +56,12 @@ end
 
 local function splitjoin(op)
   return function()
-    local DefaultHandlers = require'splitjoin.util.handlers'
+    local Node = require'splitjoin.util.node'
     local bufnr = 0
     local winnr = 0
     local node, options = get_operable_node_under_cursor(bufnr, winnr)
     if node then
-      local handler = options and options[op] or DefaultHandlers[op]
+      local handler = options and options[op] or Node[op]
       handler(node, options)
     end
   end

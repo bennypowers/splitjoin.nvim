@@ -10,10 +10,7 @@ return {
 
     arguments = {
       surround = { '(', ')' },
-      separator = ',',
       trailing_separator = false,
-      split = Node.split,
-      join = Node.join,
     },
 
     function_declaration = {
@@ -40,9 +37,6 @@ return {
 
     table_constructor = {
       surround = { '{', '}' },
-      separator = ',',
-      split = Node.split,
-      join = Node.join,
     },
 
     variable_list = {
