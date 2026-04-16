@@ -1,17 +1,22 @@
 ---@class SplitjoinLanguageOptions
----@field default_indent? string
----@field surround? string[] tuple of surround strings
----@field separator? string=','
----@field separator_is_node? boolean=true
----@field padding? string
----@field trailing_separator? boolean=true true when a trailing separator (e.g. trailing comma) is permitted/desired
+---@field default_indent? string|fun():string # indent for split items; defaults to '  '
+---@field surround? string[] # tuple of open/close delimiters
+---@field separator? string # item separator; defaults to ','
+---@field separator_is_node? boolean # whether separator is a tree node; defaults to true
+---@field padding? string # padding inside delimiters when joining
+---@field trailing_separator? boolean # keep trailing separator when splitting; defaults to true
+---@field split? fun(node: TSNode, options: SplitjoinLanguageOptions) # custom split handler
+---@field join? fun(node: TSNode, options: SplitjoinLanguageOptions) # custom join handler
+---@field capture? string # treesitter capture name, set at runtime
+---@field lang? string # treesitter language name, set at runtime
 
 ---@class SplitjoinLanguageConfig
+---@field default_indent? string|fun():string
+---@field extends? string # inherit from another language's config
 ---@field nodes table<string, SplitjoinLanguageOptions>
 
 ---@class SplitjoinOptions
----@field default_indent? string
----@field languages table<string, SplitjoinLanguageOptions>
+---@field languages? table<string, SplitjoinLanguageConfig>
 
 local Splitjoin = {}
 
