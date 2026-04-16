@@ -63,6 +63,7 @@ return {
     },
 
     comment = {
+      default_indent = ' ',
       split = ECMAScript.split_comment,
       join = ECMAScript.join_comment,
     }
