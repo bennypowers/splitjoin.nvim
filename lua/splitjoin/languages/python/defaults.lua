@@ -1,9 +1,10 @@
 local Node = require'splitjoin.util.node'
+local String = require'splitjoin.util.string'
 
 ---@type SplitjoinLanguageConfig
 return {
 
-  default_indent = '    ',
+  default_indent = String.buffer_indent,
 
   nodes = {
 

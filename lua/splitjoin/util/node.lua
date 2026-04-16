@@ -143,7 +143,8 @@ end
 ---@param node TSNode
 ---@param options SplitjoinLanguageOptions
 function Node.split(node, options)
-  local indent = options.default_indent or '  '
+  local di = options.default_indent
+  local indent = type(di) == 'function' and di() or di or '  '
   local sep = options.separator or ','
   local separator_is_node = options.separator_is_node ~= false
   local open, close = unpack(options.surround or {})

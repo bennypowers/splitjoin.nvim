@@ -24,6 +24,16 @@ function String.filter_only_whitespace(lines)
   return filter(function(line) return String.is_lengthy(vim.trim(line)) end, lines)
 end
 
+--- Derive indent string from current buffer settings.
+--- Use as fallback for languages with semantic whitespace (e.g. Python)
+--- where a hardcoded default_indent would be wrong.
+function String.buffer_indent()
+  local sw = vim.bo.shiftwidth
+  local width = sw > 0 and sw or vim.bo.tabstop
+  local char = vim.bo.expandtab == false and '\t' or ' '
+  return string.rep(char, char == '\t' and 1 or width)
+end
+
 function String.append(target)
   local replacement = target
   local function get()

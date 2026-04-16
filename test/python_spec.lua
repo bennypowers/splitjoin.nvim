@@ -12,9 +12,9 @@ describe(lang, function()
     ]],
     d[[
       def foo(
-        a,
-        b,
-        c,
+          a,
+          b,
+          c,
       ):
           pass
     ]],
@@ -27,9 +27,9 @@ describe(lang, function()
     ]],
     d[[
       foo(
-        1,
-        2,
-        3,
+          1,
+          2,
+          3,
       )
     ]],
     '1'
@@ -41,9 +41,9 @@ describe(lang, function()
     ]=],
     d[=[
       x = [
-        1,
-        2,
-        3,
+          1,
+          2,
+          3,
       ]
     ]=],
     '1'
@@ -55,9 +55,9 @@ describe(lang, function()
     ]=],
     d[=[
       x = {
-        "a": 1,
-        "b": 2,
-        "c": 3,
+          "a": 1,
+          "b": 2,
+          "c": 3,
       }
     ]=],
     '"a"'
@@ -69,9 +69,9 @@ describe(lang, function()
     ]],
     d[[
       x = (
-        1,
-        2,
-        3,
+          1,
+          2,
+          3,
       )
     ]],
     '1'
@@ -83,9 +83,9 @@ describe(lang, function()
     ]=],
     d[=[
       x = {
-        1,
-        2,
-        3,
+          1,
+          2,
+          3,
       }
     ]=],
     '1'
@@ -97,8 +97,8 @@ describe(lang, function()
     ]=],
     d[=[
       x = [1, 2, [
-        3,
-        4,
+          3,
+          4,
       ]]
     ]=],
     '3'
@@ -110,9 +110,9 @@ describe(lang, function()
     ]=],
     d[=[
       x = [
-        1,
-        2,
-        [3, 4],
+          1,
+          2,
+          [3, 4],
       ]
     ]=],
     '1'
