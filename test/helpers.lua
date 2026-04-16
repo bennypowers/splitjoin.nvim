@@ -188,4 +188,33 @@ local function test_fn()
   end
 end
 
+--- Test toggle: joined input toggles to split, split input toggles to joined.
+---@param lang string language name
+---@param name string suite name
+---@param joined string single-line form
+---@param split string multi-line form
+---@param go_to string|number[] cursor target
+function M.make_toggle_suite(lang, name, joined, split, go_to)
+  local assert = require 'luassert'
+  local splitjoin = require'splitjoin'
+
+  describe('toggle ' .. name, function()
+    after_each(M.cleanup_tmpfiles)
+    it('splits when joined', function()
+      local bufnr = setup_buffer(joined, lang, go_to)
+      splitjoin.toggle()
+      local success, result = pcall(assert.same, normalize(split), normalize(M.get_buf_text(bufnr)))
+      if not success then error(result) end
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+    end)
+    it('joins when split', function()
+      local bufnr = setup_buffer(split, lang, go_to)
+      splitjoin.toggle()
+      local success, result = pcall(assert.same, normalize(joined), normalize(M.get_buf_text(bufnr)))
+      if not success then error(result) end
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+    end)
+  end)
+end
+
 return M

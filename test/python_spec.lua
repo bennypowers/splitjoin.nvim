@@ -104,6 +104,34 @@ describe(lang, function()
     '3'
   )
 
+  H.make_suite(lang, 'single element list',
+    d[=[
+      x = [1]
+    ]=],
+    d[=[
+      x = [
+          1,
+      ]
+    ]=],
+    '1'
+  )
+
+  H.make_suite(lang, 'indented in function',
+    d[=[
+      def foo():
+          x = [1, 2, 3]
+    ]=],
+    d[=[
+      def foo():
+          x = [
+              1,
+              2,
+              3,
+          ]
+    ]=],
+    '1'
+  )
+
   H.make_suite(lang, 'nested list outer',
     d[=[
       x = [1, 2, [3, 4]]

@@ -359,6 +359,34 @@ describe(lang, function()
     )
   end)
 
+  describe('single element', function()
+
+    H.make_suite(lang, 'array',
+      d[[
+        [1]
+      ]],
+      d[[
+        [
+          1,
+        ]
+      ]],
+      '1'
+    )
+
+    H.make_suite(lang, 'object',
+      d[[
+        { a: 1 }
+      ]],
+      d[[
+        {
+          a: 1,
+        }
+      ]],
+      'a'
+    )
+
+  end)
+
   -- describe('const f = function() { return 0; }', function()
   --   H.make_suite(lang, '',
   --     d[[
