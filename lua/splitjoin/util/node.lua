@@ -93,6 +93,20 @@ function Node.is_child_of(type, node)
   return false
 end
 
+---@param root TSNode
+---@param predicate fun(node: TSNode): boolean
+---@return TSNode|nil
+function Node.find_descendant(root, predicate)
+  local stack = { root }
+  while #stack > 0 do
+    local node = table.remove(stack)
+    if predicate(node) then return node end
+    for child in node:iter_children() do
+      table.insert(stack, child)
+    end
+  end
+end
+
 ---@param node TSNode
 ---@param replacement string
 function Node.replace(node, replacement)

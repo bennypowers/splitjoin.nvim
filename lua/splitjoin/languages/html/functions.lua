@@ -95,34 +95,17 @@ local function split_attrs(node, options)
     vim.treesitter.get_parser(0, 'html'):invalidate(true)
     local tree = vim.treesitter.get_parser(0, 'html'):parse()[1]
     if not tree then
-      Node.goto_node(node) -- fallback
+      Node.goto_node(node)
       return
     end
-    local root = tree:root()
 
-    local new_open_tag = root:descendant_for_range(open_tag_srow, open_tag_scol, open_tag_srow, open_tag_scol)
-
-    if new_open_tag and new_open_tag:type() == 'element' then
-        for child in new_open_tag:iter_children() do
-            if child:type() == 'start_tag' then
-                new_open_tag = child
-                break
-            end
-        end
-    end
-
-    local new_node_to_goto
-    if new_open_tag and new_open_tag:type() == 'start_tag' then
-      for child in new_open_tag:iter_children() do
-        if child:type() == original_node_type and Node.get_text(child) == original_node_text then
-          new_node_to_goto = child
-          break
-        end
-      end
-    end
+    local new_open_tag = tree:root():descendant_for_range(open_tag_srow, open_tag_scol, open_tag_srow, open_tag_scol)
+    local found = new_open_tag and Node.find_descendant(new_open_tag, function(nd)
+      return nd:type() == original_node_type and Node.get_text(nd) == original_node_text
+    end)
 
     -- 6. Move cursor
-    Node.goto_node(new_node_to_goto or node)
+    Node.goto_node(found or node)
   end
 end
 
@@ -165,24 +148,18 @@ local function split_children(node, options)
   vim.treesitter.get_parser(0, 'html'):invalidate(true)
   local tree = vim.treesitter.get_parser(0, 'html'):parse()[1]
   if not tree then return node end
-  local root = tree:root()
 
-  local new_element = root:descendant_for_range(srow, scol, srow, scol)
-  if not new_element then return node end
-
-  while new_element and new_element:type() ~= 'element' do
-    new_element = new_element:parent()
+  local at_pos = tree:root():descendant_for_range(srow, scol, srow, scol)
+  while at_pos and at_pos:type() ~= 'element' do
+    at_pos = at_pos:parent()
   end
+  if not at_pos then return node end
 
-  if new_element then
-    for child in new_element:iter_children() do
-      if child:type() == original_node_type and vim.trim(Node.get_text(child)) == original_node_text then
-        return child
-      end
-    end
-  end
+  local found = Node.find_descendant(at_pos, function(nd)
+    return nd:type() == original_node_type and vim.trim(Node.get_text(nd)) == original_node_text
+  end)
 
-  return node -- Return old node as fallback
+  return found or node
 end
 
 
