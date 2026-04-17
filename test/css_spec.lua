@@ -120,6 +120,21 @@ describe(lang, function()
       'color'
     )
 
+    H.make_suite(lang, 'transition with easing function',
+      d[[
+        a { transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; }
+      ]],
+      d[[
+        a { transition:
+          color
+          0.3s
+          cubic-bezier(0.4, 0, 0.2, 1),
+          opacity
+          0.3s; }
+      ]],
+      'color'
+    )
+
   end)
 
 end)
