@@ -91,4 +91,50 @@ describe(lang, function()
 
   end)
 
+  describe('declaration', function()
+
+    H.make_suite(lang, 'font list',
+      d[[
+        a { font: 12px "Fira Code", monospace; }
+      ]],
+      d[[
+        a { font:
+          12px
+          "Fira Code",
+          monospace; }
+      ]],
+      '12px'
+    )
+
+    H.make_suite(lang, 'transition list',
+      d[[
+        a { transition: color 0.3s, background 0.3s; }
+      ]],
+      d[[
+        a { transition:
+          color
+          0.3s,
+          background
+          0.3s; }
+      ]],
+      'color'
+    )
+
+    H.make_suite(lang, 'transition with easing function',
+      d[[
+        a { transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; }
+      ]],
+      d[[
+        a { transition:
+          color
+          0.3s
+          cubic-bezier(0.4, 0, 0.2, 1),
+          opacity
+          0.3s; }
+      ]],
+      'color'
+    )
+
+  end)
+
 end)

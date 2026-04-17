@@ -7,3 +7,6 @@
        (arguments) @splitjoin.css.arguments)))
 
 ((arguments) @splitjoin.css.arguments)
+
+(declaration
+  ",") @splitjoin.css.declaration
