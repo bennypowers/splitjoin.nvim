@@ -106,13 +106,7 @@ function Node.replace(node, replacement)
     end
   end
   if starts_newline then table.insert(lines, 1, '') end
-  pcall(vim.api.nvim_buf_set_text,
-        0,
-        row,
-        col,
-        row_end,
-        col_end,
-        lines)
+  vim.api.nvim_buf_set_text(0, row, col, row_end, col_end, lines)
 end
 
 ---@param node TSNode
