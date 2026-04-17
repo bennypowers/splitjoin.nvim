@@ -130,6 +130,32 @@ describe(lang, function()
       ]],
       'H'
     )
+
+    H.make_suite(lang, 'multiple children',
+      d[[
+      <div><span>A</span><span>B</span></div>
+      ]],
+      d[[
+      <div>
+        <span>A</span>
+        <span>B</span>
+      </div>
+      ]],
+      'div'
+    )
+
+    H.make_suite(lang, 'nested split',
+      d[[
+      <div><a href="#">Link</a></div>
+      ]],
+      d[[
+      <div>
+        <a href="#">Link</a>
+      </div>
+      ]],
+      'div'
+    )
+
   end)
 
 end)
