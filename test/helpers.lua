@@ -77,20 +77,23 @@ local function normalize(s)
 end
 
 local lang_ext = {
-  css = "css",
-  js  = "js",
+  c    = "c",
+  cpp  = "cpp",
+  css  = "css",
+  js   = "js",
   javascript = "js",
-  ts  = "ts",
+  ts   = "ts",
   typescript = "ts",
-  go  = "go",
+  go   = "go",
   json = "json",
   html = "html",
-  lua = "lua",
-  py  = "py",
+  lua  = "lua",
+  py   = "py",
   python = "py",
-  md  = "md",
+  rust = "rs",
+  yaml = "yaml",
+  md   = "md",
   markdown = "md",
-  -- add more as needed
 }
 
 local function setup_buffer(content, lang, go_to)

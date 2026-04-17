@@ -119,7 +119,11 @@ After:
 - **css**: rules (blocks), function arguments, value lists
 - **go**: parameter lists, structs, return lists, arguments, slices, maps
 - **python**: parameters, arguments, lists, dictionaries, tuples, sets
+- **rust**: params, arguments, struct fields, enum variants, use lists, tuples, match blocks
+- **c**: parameter lists, argument lists, initializer lists, enums, struct fields
+- **c++**: all C constructs, plus template parameters and arguments
 - **json**: objects, arrays
+- **yaml**: flow sequences, flow mappings
 - **jsdoc**: descriptions
 
 ### Third-party languages

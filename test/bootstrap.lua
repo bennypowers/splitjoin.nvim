@@ -8,6 +8,8 @@ Setup.setup()
 
 local ts = require 'nvim-treesitter'
 ts.install({
+  'c',
+  'cpp',
   'css',
   'go',
   'html',
@@ -16,5 +18,7 @@ ts.install({
   'json',
   'lua',
   'python',
+  'rust',
   'typescript',
-}):wait(30000)
+  'yaml',
+}):wait(60000)
