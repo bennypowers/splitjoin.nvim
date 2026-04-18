@@ -17,6 +17,7 @@ ts.install({
   'jsdoc',
   'json',
   'lua',
+  'nix',
   'python',
   'rust',
   'typescript',

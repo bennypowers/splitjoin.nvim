@@ -88,6 +88,7 @@ local lang_ext = {
   json = "json",
   html = "html",
   lua  = "lua",
+  nix  = "nix",
   py   = "py",
   python = "py",
   rust = "rs",
