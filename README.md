@@ -122,15 +122,42 @@ After:
 - **rust**: params, arguments, struct fields, enum variants, use lists, tuples, match blocks
 - **c**: parameter lists, argument lists, initializer lists, enums, struct fields
 - **c++**: all C constructs, plus template parameters and arguments
+- **nix**: lists
 - **json**: objects, arrays
 - **yaml**: flow sequences, flow mappings
 - **jsdoc**: descriptions
 
-### Third-party languages
+### Adding a new language
 
 Language modules are auto-discovered from the runtimepath. To add support for a 
-new language, create `lua/splitjoin/languages/<lang>/defaults.lua` anywhere on 
-your runtimepath. See existing language modules for examples.
+new language:
+
+1. Create a treesitter query at `queries/<lang>/splitjoin.scm` that captures 
+   the node types you want to split/join
+2. Create `lua/splitjoin/languages/<lang>/defaults.lua` returning a table with 
+   a `nodes` key mapping node types to their options
+3. Optionally create `options.lua` (user-facing defaults like `default_indent`) 
+   and `functions.lua` (custom split/join handlers) in the same directory
+
+Most languages only need a `defaults.lua` with surround pairs. The default 
+`Node.split`/`Node.join` handlers work for any comma-separated, 
+surround-delimited construct:
+
+```lua
+-- lua/splitjoin/languages/mylang/defaults.lua
+return {
+  nodes = {
+    argument_list = { surround = { '(', ')' } },
+    array         = { surround = { '[', ']' } },
+  },
+}
+```
+
+For space-delimited or otherwise non-standard constructs, write custom handlers 
+in `functions.lua` (see `nix/functions.lua` for an example).
+
+Third-party plugins can provide language support by placing these files anywhere 
+on the runtimepath.
 
 [vmp]: https://github.com/t9md/atom-vim-mode-plus
 [sjv]: https://github.com/AndrewRadev/splitjoin.vim
