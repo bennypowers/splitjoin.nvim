@@ -124,7 +124,7 @@ After:
 - **c++**: all C constructs, plus template parameters and arguments
 - **nix**: lists
 - **json**: objects, arrays
-- **yaml**: flow sequences, flow mappings
+- **yaml**: flow sequences, flow mappings, block sequences
 - **jsdoc**: descriptions
 
 ### Adding a new language
