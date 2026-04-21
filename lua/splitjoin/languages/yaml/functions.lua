@@ -61,7 +61,11 @@ function Yaml.split_flow_sequence(node, options)
   end
 
   vim.api.nvim_buf_set_text(0, row, start_col, row_end, col_end, lines)
-  pcall(vim.api.nvim_win_set_cursor, 0, { row + 2, #(base_indent .. indent) })
+  if start_col == 0 then
+    pcall(vim.api.nvim_win_set_cursor, 0, { row + 1, #base_indent })
+  else
+    pcall(vim.api.nvim_win_set_cursor, 0, { row + 2, #(base_indent .. indent) })
+  end
 end
 
 function Yaml.join_block_sequence(node, options)
