@@ -61,16 +61,9 @@ end
 
 local _last_op = nil
 
-local function clamp_cursor(bufnr, row, col)
-  local line_count = vim.api.nvim_buf_line_count(bufnr)
-  row = math.max(1, math.min(row, line_count))
-  local line = vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1] or ''
-  col = math.max(0, math.min(col, #line - 1))
-  return { row, col }
-end
-
 local function do_splitjoin(op)
   local Node = require'splitjoin.util.node'
+  local Cursor = require'splitjoin.util.cursor'
   local node, options = get_operable_node_under_cursor(0, 0)
   if not node then return end
   if op == 'toggle' then
@@ -79,7 +72,7 @@ local function do_splitjoin(op)
   local saved_cursor = vim.api.nvim_win_get_cursor(0)
   local handler = options and options[op] or Node[op]
   handler(node, options)
-  local restored = clamp_cursor(0, saved_cursor[1], saved_cursor[2])
+  local restored = Cursor.clamp(0, saved_cursor[1], saved_cursor[2])
   pcall(vim.api.nvim_win_set_cursor, 0, restored)
 end
 
