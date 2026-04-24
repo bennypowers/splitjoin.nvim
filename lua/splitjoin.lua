@@ -63,13 +63,17 @@ local _last_op = nil
 
 local function do_splitjoin(op)
   local Node = require'splitjoin.util.node'
+  local Cursor = require'splitjoin.util.cursor'
   local node, options = get_operable_node_under_cursor(0, 0)
   if not node then return end
   if op == 'toggle' then
     op = Node.get_text(node):find('\n') and 'join' or 'split'
   end
+  local saved_cursor = vim.api.nvim_win_get_cursor(0)
   local handler = options and options[op] or Node[op]
   handler(node, options)
+  local restored = Cursor.clamp(0, saved_cursor[1], saved_cursor[2])
+  pcall(vim.api.nvim_win_set_cursor, 0, restored)
 end
 
 --- Operatorfunc callback for dot-repeat support.

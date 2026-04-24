@@ -97,7 +97,7 @@ local lang_ext = {
   markdown = "md",
 }
 
-local function setup_buffer(content, lang, go_to)
+function M.setup_buffer(content, lang, go_to)
   local ext = lang_ext[lang] or "txt"
   local tmpname = "/tmp/test_" .. tostring(os.time()) .. "_" .. tostring(math.random(1e8, 1e9-1)) .. "."..ext
   local f = assert(io.open(tmpname, "w"))
@@ -142,7 +142,7 @@ local function test_fn()
     describe('splits', function()
       after_each(M.cleanup_tmpfiles)
       it('as expected', function()
-        local bufnr = setup_buffer(input, lang, go_to)
+        local bufnr = M.setup_buffer(input, lang, go_to)
         local before_log = log_cursor_position_in_file(bufnr)
 
         splitjoin.split()
@@ -161,10 +161,16 @@ local function test_fn()
         vim.api.nvim_buf_delete(bufnr, { force = true })
       end)
       it('and rejoins as expected', function()
-        local bufnr = setup_buffer(input, lang, go_to)
+        local bufnr = M.setup_buffer(input, lang, go_to)
         local before_log = log_cursor_position_in_file(bufnr)
         splitjoin.split()
         local after_split_log = log_cursor_position_in_file(bufnr)
+        vim.api.nvim_win_set_cursor(0, {1, 0})
+        if type(go_to) == 'string' then
+          vim.fn.search(go_to)
+        elseif type(go_to) == 'table' then
+          vim.api.nvim_win_set_cursor(0, go_to)
+        end
         splitjoin.join()
         local after_join_log = log_cursor_position_in_file(bufnr)
 
@@ -205,14 +211,14 @@ function M.make_toggle_suite(lang, name, joined, split, go_to)
   describe('toggle ' .. name, function()
     after_each(M.cleanup_tmpfiles)
     it('splits when joined', function()
-      local bufnr = setup_buffer(joined, lang, go_to)
+      local bufnr = M.setup_buffer(joined, lang, go_to)
       splitjoin.toggle()
       local success, result = pcall(assert.same, normalize(split), normalize(M.get_buf_text(bufnr)))
       if not success then error(result) end
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
     it('joins when split', function()
-      local bufnr = setup_buffer(split, lang, go_to)
+      local bufnr = M.setup_buffer(split, lang, go_to)
       splitjoin.toggle()
       local success, result = pcall(assert.same, normalize(joined), normalize(M.get_buf_text(bufnr)))
       if not success then error(result) end
