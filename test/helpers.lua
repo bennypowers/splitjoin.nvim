@@ -165,6 +165,12 @@ local function test_fn()
         local before_log = log_cursor_position_in_file(bufnr)
         splitjoin.split()
         local after_split_log = log_cursor_position_in_file(bufnr)
+        vim.api.nvim_win_set_cursor(0, {1, 0})
+        if type(go_to) == 'string' then
+          vim.fn.search(go_to)
+        elseif type(go_to) == 'table' then
+          pcall(vim.api.nvim_win_set_cursor, 0, go_to)
+        end
         splitjoin.join()
         local after_join_log = log_cursor_position_in_file(bufnr)
 
