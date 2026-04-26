@@ -70,9 +70,11 @@ local function do_splitjoin(op)
     op = Node.get_text(node):find('\n') and 'join' or 'split'
   end
   local saved_cursor = vim.api.nvim_win_get_cursor(0)
+  local hold_ctx = Cursor.hold(0, saved_cursor, node)
   local handler = options and options[op] or Node[op]
   handler(node, options)
-  local restored = Cursor.clamp(0, saved_cursor[1], saved_cursor[2])
+  local restored = Cursor.restore_hold(0, hold_ctx)
+                or Cursor.clamp(0, saved_cursor[1], saved_cursor[2])
   pcall(vim.api.nvim_win_set_cursor, 0, restored)
 end
 
