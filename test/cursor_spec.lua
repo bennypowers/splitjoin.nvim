@@ -1,167 +1,166 @@
 local H = require'test.helpers'
 
-local d = require'plenary.strings'.dedent
-
 describe('cursor position', function()
 
   after_each(H.cleanup_tmpfiles)
 
   local splitjoin = require'splitjoin'
 
-  -- SPLIT: cursor col should clamp to shortened first line
+  -- HOLD: cursor tracks character across split/join
 
-  describe('split clamps cursor col', function()
+  describe('hold — split tracks character', function()
 
-    it('lua table', function()
-      -- local t = { a = 1, b = 2, c = 3 }
-      --                  ^ col 17 (comma)
-      -- after split, line 1 = "local t = {" (11 chars, cols 0-10)
+    it('lua table comma', function()
       local bufnr = H.setup_buffer('local t = { a = 1, b = 2, c = 3 }\n', 'lua', {1, 17})
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.split()
-      assert.same({1, 10}, vim.api.nvim_win_get_cursor(0))
+      assert.same(',', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
-    it('lua function args', function()
-      -- call(a, b, c)
-      --       ^ col 6 (comma)
-      -- after split, line 1 = "call(" (5 chars, cols 0-4)
+    it('lua function args comma', function()
       local bufnr = H.setup_buffer('call(a, b, c)\n', 'lua', {1, 6})
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.split()
-      assert.same({1, 4}, vim.api.nvim_win_get_cursor(0))
+      assert.same(',', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
-    it('typescript union', function()
-      -- type A = 1|2|3;
-      --           ^ col 10 (first pipe)
-      -- after split, line 1 = "type A =" (8 chars, cols 0-7)
-      local bufnr = H.setup_buffer('type A = 1|2|3;\n', 'typescript', {1, 10})
-      splitjoin.split()
-      assert.same({1, 7}, vim.api.nvim_win_get_cursor(0))
-      vim.api.nvim_buf_delete(bufnr, { force = true })
-    end)
-
-    it('go struct', function()
-      -- type User struct { Name string; Age int; Email string }
-      --                    ^ col 19 (N of Name)
-      -- after split, line 1 = "type User struct {" (18 chars, cols 0-17)
+    it('go struct field name', function()
       local bufnr = H.setup_buffer('type User struct { Name string; Age int; Email string }\n', 'go', {1, 19})
+      assert.same('N', H.get_char_at_cursor())
       splitjoin.split()
-      assert.same({1, 17}, vim.api.nvim_win_get_cursor(0))
+      assert.same('N', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
-    it('javascript object', function()
-      -- { one: 1, two: 2, three: 3 }
-      --         ^ col 8 (comma)
-      -- after split, line 1 = "{" (1 char, col 0)
+    it('javascript object comma', function()
       local bufnr = H.setup_buffer('{ one: 1, two: 2, three: 3 }\n', 'javascript', {1, 8})
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.split()
-      assert.same({1, 0}, vim.api.nvim_win_get_cursor(0))
+      assert.same(',', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
-    it('json object', function()
-      -- { "one": 1, "two": 2, "three": 3 }
-      --           ^ col 10 (comma)
-      -- after split, line 1 = "{" (1 char, col 0)
+    it('json object comma', function()
       local bufnr = H.setup_buffer('{ "one": 1, "two": 2, "three": 3 }\n', 'json', {1, 10})
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.split()
-      assert.same({1, 0}, vim.api.nvim_win_get_cursor(0))
+      assert.same(',', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
-  end)
+    it('opening brace stays on opening brace', function()
+      local bufnr = H.setup_buffer('local t = { a = 1, b = 2 }\n', 'lua', {1, 10})
+      assert.same('{', H.get_char_at_cursor())
+      splitjoin.split()
+      assert.same('{', H.get_char_at_cursor())
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+    end)
 
-  -- SPLIT: cursor preserved when position is within bounds of new line
-
-  describe('split preserves cursor when within bounds', function()
+    it('closing brace stays on closing brace', function()
+      local bufnr = H.setup_buffer('local t = { a = 1, b = 2 }\n', 'lua', {1, 26})
+      assert.same('}', H.get_char_at_cursor())
+      splitjoin.split()
+      assert.same('}', H.get_char_at_cursor())
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+    end)
 
     it('html attrs — cursor on first attribute', function()
-      -- <a id="a" href="#">Hi</a>
-      --    ^ col 3 (i of id)
-      -- after split, line 1 still has id attr, col 3 within bounds
       local bufnr = H.setup_buffer('<a id="a" href="#">Hi</a>\n', 'html', {1, 3})
+      assert.same('i', H.get_char_at_cursor())
       splitjoin.split()
-      assert.same({1, 3}, vim.api.nvim_win_get_cursor(0))
-      vim.api.nvim_buf_delete(bufnr, { force = true })
-    end)
-
-    it('lua table — cursor at opening brace', function()
-      -- local t = { a = 1, b = 2, c = 3 }
-      --           ^ col 10 ({)
-      -- after split, line 1 = "local t = {" — col 10 within bounds
-      local bufnr = H.setup_buffer('local t = { a = 1, b = 2, c = 3 }\n', 'lua', {1, 10})
-      splitjoin.split()
-      assert.same({1, 10}, vim.api.nvim_win_get_cursor(0))
+      assert.same('i', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
   end)
 
-  -- JOIN: split first, reposition cursor, then join
-  -- This mirrors real usage and ensures the split form matches what join expects
+  -- HOLD: split+join roundtrip
 
-  describe('join after split', function()
+  describe('hold — roundtrip', function()
 
-    it('lua table — comma on row 2 clamps to row 1', function()
+    it('lua table comma roundtrip', function()
       local bufnr = H.setup_buffer('local t = { a = 1, b = 2, c = 3 }\n', 'lua', {1, 17})
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.split()
-      vim.fn.search(',')
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.join()
-      assert.same({1, 7}, vim.api.nvim_win_get_cursor(0))
+      assert.same(',', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
-    it('typescript union — pipe on row 2 clamps to row 1', function()
-      local bufnr = H.setup_buffer('type A = 1|2|3;\n', 'typescript', {1, 10})
+    it('lua function args comma roundtrip', function()
+      local bufnr = H.setup_buffer('vim.print("foo", "bar")\n', 'lua', {1, 15})
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.split()
-      vim.fn.search('|')
+      assert.same(',', H.get_char_at_cursor())
       splitjoin.join()
-      assert.same({1, 0}, vim.api.nvim_win_get_cursor(0))
+      assert.same(',', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
-    it('html attrs — href on row 2 clamps to row 1', function()
-      local bufnr = H.setup_buffer('<a id="a" href="#">Hi</a>\n', 'html', {1, 3})
+    it('opening brace roundtrip', function()
+      local bufnr = H.setup_buffer('local t = { a = 1, b = 2 }\n', 'lua', {1, 10})
+      assert.same('{', H.get_char_at_cursor())
       splitjoin.split()
-      vim.fn.search('href')
+      assert.same('{', H.get_char_at_cursor())
       splitjoin.join()
-      assert.same({1, 4}, vim.api.nvim_win_get_cursor(0))
-      vim.api.nvim_buf_delete(bufnr, { force = true })
-    end)
-
-    it('go struct — brace on row 1 stays on row 1', function()
-      local bufnr = H.setup_buffer('type User struct { Name string; Age int; Email string }\n', 'go', {1, 19})
-      splitjoin.split()
-      vim.fn.search('{')
-      splitjoin.join()
-      assert.same({1, 17}, vim.api.nvim_win_get_cursor(0))
-      vim.api.nvim_buf_delete(bufnr, { force = true })
-    end)
-
-    it('javascript object — comma on row 2 clamps to row 1', function()
-      local bufnr = H.setup_buffer('{ one: 1, two: 2, three: 3 }\n', 'javascript', {1, 8})
-      splitjoin.split()
-      vim.fn.search(',')
-      splitjoin.join()
-      assert.same({1, 8}, vim.api.nvim_win_get_cursor(0))
+      assert.same('{', H.get_char_at_cursor())
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
   end)
 
-  -- JOIN: cursor col preserved when row doesn't change
+  -- HOLD: duplicate content — proves structural indexing, not char matching
 
-  describe('join preserves cursor col on row 1', function()
+  describe('hold — duplicate content', function()
 
-    it('lua table — cursor on opening brace stays', function()
-      local bufnr = H.setup_buffer('local t = { a = 1, b = 2, c = 3 }\n', 'lua', {1, 10})
+    it('cursor on 2nd a in f(a, a, a) stays on 2nd a after split', function()
+      -- f(a, a, a)
+      --      ^ col 5 (2nd a)
+      local bufnr = H.setup_buffer('f(a, a, a)\n', 'lua', {1, 5})
+      assert.same('a', H.get_char_at_cursor())
+
       splitjoin.split()
-      vim.api.nvim_win_set_cursor(0, {1, 10})
+      assert.same('a', H.get_char_at_cursor())
+
+      -- verify it's the 2nd a, not the 1st — cursor should be on row 3
+      local cursor = vim.api.nvim_win_get_cursor(0)
+      assert.same(3, cursor[1])
+
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+    end)
+
+    it('cursor on 3rd 1 in table stays on 3rd 1 after split', function()
+      -- local t = { 1, 1, 1 }
+      --                   ^ col 18 (3rd 1)
+      local bufnr = H.setup_buffer('local t = { 1, 1, 1 }\n', 'lua', {1, 18})
+      assert.same('1', H.get_char_at_cursor())
+
+      splitjoin.split()
+      assert.same('1', H.get_char_at_cursor())
+
+      -- verify it's the 3rd 1 — cursor should be on row 4
+      local cursor = vim.api.nvim_win_get_cursor(0)
+      assert.same(4, cursor[1])
+
+      vim.api.nvim_buf_delete(bufnr, { force = true })
+    end)
+
+    it('roundtrip preserves position with duplicate args', function()
+      -- f(x, x, x)
+      --         ^ col 8 (3rd x)
+      local bufnr = H.setup_buffer('f(x, x, x)\n', 'lua', {1, 8})
+      assert.same('x', H.get_char_at_cursor())
+
+      splitjoin.split()
+      assert.same('x', H.get_char_at_cursor())
+
       splitjoin.join()
-      assert.same({1, 10}, vim.api.nvim_win_get_cursor(0))
+      assert.same('x', H.get_char_at_cursor())
+      assert.same({1, 8}, vim.api.nvim_win_get_cursor(0))
+
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
