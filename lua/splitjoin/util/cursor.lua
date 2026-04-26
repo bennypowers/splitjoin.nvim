@@ -25,39 +25,35 @@ function M.hold(bufnr, cursor, node)
   local node_srow, node_scol = node:range()
   local node_type = node:type()
 
-  local nws_total = 0
+  local nws_children = {}
+  local found_index = nil
+  local found_offset = nil
+
   for child in node:iter_children() do
     if get_node_text(child, bufnr):match('%S') then
-      nws_total = nws_total + 1
+      local idx = #nws_children
+      if not found_index and is_in_node_range(child, cursor_row, cursor_col) then
+        local csrow, cscol = child:range()
+        found_index = idx
+        found_offset = math.max(0, cursor_col - cscol)
+      end
+      nws_children[idx + 1] = true
     end
   end
 
-  local nws_index = 0
-  for child in node:iter_children() do
-    local text = get_node_text(child, bufnr)
-    if text:match('%S') then
-      if is_in_node_range(child, cursor_row, cursor_col) then
-        local csrow, cscol = child:range()
-        local offset
-        if cursor_row == csrow then
-          offset = cursor_col - cscol
-        else
-          offset = cursor_col
-        end
-        return {
-          nws_index = nws_index,
-          is_last = (nws_index == nws_total - 1),
-          offset = math.max(0, offset),
-          node_srow = node_srow,
-          node_scol = node_scol,
-          node_type = node_type,
-          cursor = cursor,
-        }
-      end
-      nws_index = nws_index + 1
-    end
+  if not found_index then
+    return nil
   end
-  return nil
+
+  return {
+    nws_index = found_index,
+    is_last = (found_index == #nws_children - 1),
+    offset = found_offset,
+    node_srow = node_srow,
+    node_scol = node_scol,
+    node_type = node_type,
+    cursor = cursor,
+  }
 end
 
 ---@param bufnr number
@@ -77,7 +73,13 @@ function M.restore_hold(bufnr, ctx)
     ignore_injections = false,
   })
 
-  while new_node and new_node:type() ~= ctx.node_type do
+  while new_node do
+    if new_node:type() == ctx.node_type then
+      local sr, sc = new_node:range()
+      if sr == ctx.node_srow and sc == ctx.node_scol then
+        break
+      end
+    end
     new_node = new_node:parent()
   end
 
@@ -85,32 +87,24 @@ function M.restore_hold(bufnr, ctx)
     return M.clamp(bufnr, ctx.cursor[1], ctx.cursor[2])
   end
 
-  local target_index = ctx.nws_index
-  if ctx.is_last then
-    local new_total = 0
-    for child in new_node:iter_children() do
-      if get_node_text(child, bufnr):match('%S') then
-        new_total = new_total + 1
-      end
-    end
-    target_index = new_total - 1
-  end
-
-  local nws_count = 0
+  local nws = {}
   for child in new_node:iter_children() do
-    local text = get_node_text(child, bufnr)
-    if text:match('%S') then
-      if nws_count == target_index then
-        local csrow, cscol = child:range()
-        local first_line = text:match('[^\n]*')
-        local col = math.min(cscol + ctx.offset, cscol + #first_line - 1)
-        return { csrow + 1, math.max(0, col) }
-      end
-      nws_count = nws_count + 1
+    if get_node_text(child, bufnr):match('%S') then
+      nws[#nws + 1] = child
     end
   end
 
-  return M.clamp(bufnr, ctx.cursor[1], ctx.cursor[2])
+  local target = ctx.is_last and nws[#nws] or nws[ctx.nws_index + 1]
+
+  if not target then
+    return M.clamp(bufnr, ctx.cursor[1], ctx.cursor[2])
+  end
+
+  local csrow, cscol = target:range()
+  local first_line = get_node_text(target, bufnr):match('[^\n]*')
+  local max_offset = math.max(0, #first_line - 1)
+  local col = cscol + math.min(ctx.offset, max_offset)
+  return { csrow + 1, math.max(0, col) }
 end
 
 return M

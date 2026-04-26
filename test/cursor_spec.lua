@@ -159,7 +159,7 @@ describe('cursor position', function()
 
       splitjoin.join()
       assert.same('x', H.get_char_at_cursor())
-      assert.same(8, vim.api.nvim_win_get_cursor(0)[2])
+      assert.same({1, 8}, vim.api.nvim_win_get_cursor(0))
 
       vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
