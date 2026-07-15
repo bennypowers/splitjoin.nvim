@@ -1,6 +1,20 @@
 --- Options functions
 local Options = {}
 
+local BUILTIN_ALIASES = {
+  jsonc = 'json',
+}
+
+function Options.resolve_lang(lang)
+  local user_config = vim.g.splitjoin
+  if type(user_config) == 'function' then user_config = user_config() end
+  local user_aliases = user_config and user_config.aliases or {}
+  if user_aliases[lang] ~= nil then
+    return user_aliases[lang] or lang
+  end
+  return BUILTIN_ALIASES[lang] or lang
+end
+
 local function copy(tbl)
   return vim.tbl_deep_extend('keep', tbl, {})
 end
@@ -48,6 +62,17 @@ local function ensure_initialized()
       for _, node_opts in pairs(OPTIONS.languages[lang].nodes or {}) do
         if node_opts.default_indent == nil then
           node_opts.default_indent = di
+        end
+      end
+    end
+  end
+  if user_config and user_config.languages then
+    for lang, passed in pairs(user_config.languages) do
+      if not OPTIONS.languages[lang] then
+        local target = Options.resolve_lang(lang)
+        if target ~= lang and OPTIONS.languages[target] then
+          OPTIONS.languages[lang] = vim.tbl_deep_extend('force',
+            copy(OPTIONS.languages[target]), passed)
         end
       end
     end

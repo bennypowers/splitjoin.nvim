@@ -86,6 +86,7 @@ local lang_ext = {
   typescript = "ts",
   go   = "go",
   json = "json",
+  jsonc = "jsonc",
   html = "html",
   lua  = "lua",
   nix  = "nix",

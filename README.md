@@ -60,6 +60,31 @@ vim.g.splitjoin = {
 }
 ```
 
+### Aliases
+
+Map a treesitter language to an existing splitjoin language. Useful for variants 
+that share the same grammar (e.g., `jsonc` uses the `json` parser):
+
+```lua
+require('splitjoin').setup({
+  aliases = {
+    my_json_variant = 'json',
+  },
+})
+```
+
+Built-in aliases: `jsonc` -> `json`. Disable a built-in alias with `false`:
+
+```lua
+require('splitjoin').setup({
+  aliases = { jsonc = false },
+})
+```
+
+When you need more than a pure alias (custom handlers, extra node types), create 
+the language's query and config files -- they take priority over the alias 
+automatically.
+
 ### Language options
 
 | name                    | type                    | description                                         |
@@ -123,7 +148,7 @@ After:
 - **c**: parameter lists, argument lists, initializer lists, enums, struct fields
 - **c++**: all C constructs, plus template parameters and arguments
 - **nix**: lists
-- **json**: objects, arrays
+- **json/jsonc**: objects, arrays
 - **yaml**: flow sequences, flow mappings, block sequences
 - **jsdoc**: descriptions
 

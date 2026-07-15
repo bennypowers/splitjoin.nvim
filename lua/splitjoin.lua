@@ -16,6 +16,7 @@
 ---@field nodes table<string, SplitjoinLanguageOptions>
 
 ---@class SplitjoinOptions
+---@field aliases? table<string, string|false>
 ---@field languages? table<string, SplitjoinLanguageConfig>
 
 local Splitjoin = {}
@@ -35,8 +36,9 @@ local function get_operable_node_under_cursor(bufnr, winnr)
   local langtree = tsparser:language_for_range(cursor_range);
   local tstree = langtree:tree_for_range(cursor_range, { ignore_injections = false }) or langtree:trees()[1]
   if not tstree then return nil, nil end
-  local lang = langtree:lang()
-  local query = get_query(lang, 'splitjoin')
+  local raw_lang = langtree:lang()
+  local resolved = Options.resolve_lang(raw_lang)
+  local query = get_query(raw_lang, 'splitjoin') or get_query(resolved, 'splitjoin')
   local nodes = {}
 
   if query then
@@ -51,9 +53,12 @@ local function get_operable_node_under_cursor(bufnr, winnr)
 
   if result then
     local node, name = unpack(result)
-    local options = Options.get_options_for(lang, node:type()) or {}
+    local options = Options.get_options_for(raw_lang, node:type())
+    if next(options) == nil then
+      options = Options.get_options_for(resolved, node:type())
+    end
           options.capture = name
-          options.lang = lang
+          options.lang = raw_lang
     Node.cache_parser(node, tsparser)
     return node, options
   end
