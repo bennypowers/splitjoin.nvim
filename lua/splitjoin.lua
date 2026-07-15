@@ -30,9 +30,15 @@ local function get_operable_node_under_cursor(bufnr, winnr)
 
   local row, col = unpack(vim.api.nvim_win_get_cursor(winnr))
   local cursor_range = { row - 1, col, row - 1, col }
-  local tsparser = get_parser(bufnr)
-     if tsparser == nil then return end
-        tsparser:parse()
+  local ok, tsparser = pcall(get_parser, bufnr)
+  if not ok or tsparser == nil then
+    local resolved = Options.resolve_lang(vim.bo[bufnr].filetype)
+    if resolved ~= vim.bo[bufnr].filetype then
+      ok, tsparser = pcall(get_parser, bufnr, resolved)
+    end
+    if not ok or tsparser == nil then return end
+  end
+  tsparser:parse()
   local langtree = tsparser:language_for_range(cursor_range);
   local tstree = langtree:tree_for_range(cursor_range, { ignore_injections = false }) or langtree:trees()[1]
   if not tstree then return nil, nil end
